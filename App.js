@@ -24,6 +24,16 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+import MqttManager from './mqtt';
+
+// init mqtt
+MqttManager.create(
+  'bob',
+  {
+    uri: 'mqtt://test.mosquitto.org:1883',
+  },
+);
+
 const App = () => {
   return (
     <Fragment>
