@@ -6,119 +6,84 @@
  * @flow
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
-  Text,
-  StatusBar,
+  Text
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-import MqttManager from './mqtt';
+import MqttManager from './connections/mqtt';
 
 // init mqtt
 MqttManager.create(
   'bob',
   {
-    uri: 'mqtt://test.mosquitto.org:1883',
+    uri: 'mqtt://141.64.75.233:1883',
   },
 );
 
 const App = () => {
   return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
+    <View style={styles.screen}>
+      <View style={styles.titleContainter}>
+        <Text style={styles.title}>PrintED Project</Text> 
+      </View>
+      <View style={styles.tempContainer}>
+        <Text style={styles.tempLabel}>Temp</Text>
+        <Text style={styles.tempText}>27C</Text>
+      </View>
+      <View style={styles.humContainer}>
+        <Text style={styles.humLabel}>Humidity</Text>
+        <Text style={styles.humText}>50%</Text>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  screen : {
+    justifyContent: 'center',
+    alignContent:'center',
+    padding: 50,
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+
+  titleContainter: {
+    marginBottom: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  body: {
-    backgroundColor: Colors.white,
+  title: {
+    fontFamily: 'roboto',
+    fontSize: 30,
+    color: 'blue'
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+
+  tempContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
+  tempLabel: {
+    fontSize: 16,
+    fontWeight: 'bold'
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
+  tempText: {
+    fontSize: 16
   },
-  highlight: {
-    fontWeight: '700',
+
+  humContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10
   },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  humLabel: {
+    fontSize: 16,
+    fontWeight: 'bold'
   },
+  humText: {
+    fontSize: 16
+  }
 });
 
 export default App;

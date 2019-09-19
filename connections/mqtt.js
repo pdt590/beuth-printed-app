@@ -55,7 +55,7 @@ module.exports = {
   },
 
   onError(error) {
-    console.error(`MQTT onError: ${error}`);
+    console.log(`MQTT onError: ${error}`);
   },
 
   onConnectionOpened() {
