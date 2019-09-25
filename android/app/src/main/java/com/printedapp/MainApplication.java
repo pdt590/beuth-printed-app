@@ -14,6 +14,7 @@ import com.facebook.soloader.SoLoader;
 import java.util.List;
 
 import com.tuanpm.RCTMqtt.*;
+import it.innove.BleManagerPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 

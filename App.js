@@ -26,13 +26,7 @@ Mqtt.create(
 );
 
 // init ble
-if (Platform.OS === 'ios') {
-  Ble.manager.onStateChange((state) => {
-    if (state === 'PoweredOn') Ble.scanAndConnect()
-  })
-} else {
-  Ble.scanAndConnect()
-};
+
 
 const App = () => {
   return (
