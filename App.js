@@ -10,18 +10,29 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  Text
+  Text,
+  Platform
 } from 'react-native';
 
-import MqttManager from './connections/mqtt';
+import Mqtt from './connections/mqtt';
+import Ble from './connections/ble';
 
 // init mqtt
-MqttManager.create(
+Mqtt.create(
   'bob',
   {
     uri: 'mqtt://141.64.75.233:1883',
   },
 );
+
+// init ble
+if (Platform.OS === 'ios') {
+  Ble.manager.onStateChange((state) => {
+    if (state === 'PoweredOn') Ble.scanAndConnect()
+  })
+} else {
+  Ble.scanAndConnect()
+};
 
 const App = () => {
   return (
