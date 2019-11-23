@@ -30,6 +30,7 @@ module.exports = {
     console.log(`BLE onError: ${error}`)
   },
   onUpdateValue(key, value) {
+    return `Key: ${key}; Value: ${value}`
   },
 
   scanAndConnect() {
@@ -38,7 +39,7 @@ module.exports = {
 
       if (error) {
         this.onError(error.message)
-        return
+        return error.message
       }
 
       if (device.name === 'TI BLE Sensor Tag' || device.name === 'SensorTag') {
