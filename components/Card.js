@@ -4,7 +4,6 @@ import { Content, Text, Icon, Body} from 'native-base';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 
 export default class Card extends Component {
-
   render() {
     return (
       <Content padder>
@@ -17,14 +16,14 @@ export default class Card extends Component {
             </Row>
             <Row style= {{paddingTop: 15}}>
               <Body>
-                <Text style={{fontSize: 70, color: 'dimgray'}}>20°</Text>
+                <Text style={{fontSize: 70, color: 'dimgray'}}>{this.props.value}°</Text>
               </Body>
             </Row>
           </Col>
           <Col size={3} style={styles.infoSection}>
             <Row size={3}>
               <View>
-                <Text style={{fontSize: 20, color: 'dimgray'}}>Duy-Thang Phan</Text>
+                <Text style={{fontSize: 20, color: 'dimgray'}}>{this.props.name}</Text>
                 <Text note style={{fontSize: 18}}>Berlin</Text>
               </View>
             </Row>
