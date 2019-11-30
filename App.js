@@ -55,19 +55,21 @@ export default class App extends Component {
         value: value,
         updatedTime: Date.now()
       }}})
+      //console.log('updateValue', this.state.devices)
     }
   }
 
   // Updating device
-  updateDevice(key, name) {
+  updateDevice(device) {
+    const key = device.id
     if (!(key in this.state.devices))
     {
       this.setState({devices: {...this.state.devices, [key]: {
-        name: name,
+        name: device.name,
         value: null,
         updatedTime: Date.now()
       }}})
-      console.log('updateDevice', this.state.devices)
+      //console.log('updateDevice', this.state.devices)
     }
   }
 
@@ -99,8 +101,7 @@ export default class App extends Component {
     this.manager.startDeviceScan(null, null, (error, device) => {
       this.info("Scanning...")
       if (error) {
-        this.error(error.message)
-        console.log('error 01')
+        this.error('error 01 - ' + error.message)
         return
       }
       
@@ -117,21 +118,20 @@ export default class App extends Component {
           })
           .then((device) => {
             this.info("Setting notifications")
-            this.updateDevice(device.id, device.name)
+            this.updateDevice(device)
             device.monitorCharacteristicForService(this.targetServiceUUID, this.targetCharacteristicUUID, 
               (error, characteristic) => {
                 if (error) {
-                  this.error(error.message)
-                  console.log('error 02')
+                  this.error('error 02 - ' + error.message)
                   this.removeDevice(device.id)
                   return
                 }
                 const buffer = new Buffer(characteristic.value, 'base64')
-                this.updateValue(device.id, buffer.readInt32LE(0))
+                const key = device.id
+                this.updateValue(key, buffer.readFloatLE(0))
               })
           }, (error) => {
-            this.error(error.message)
-            console.log('error 03')
+            this.error('error 03 - ' + error.message)
           }) 
       }
     });
@@ -158,7 +158,7 @@ export default class App extends Component {
         </Header>
         <ScrollView>
           {Object.keys(this.state.devices).map((key) => {
-              return <Card key={key} value={this.state.devices[key].value} name={this.state.devices[key].name}/>
+              return <Card key={key} device={this.state.devices[key]}/>
           })}
         </ScrollView>
       </Container>
