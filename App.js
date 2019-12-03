@@ -79,10 +79,7 @@ export default class App extends Component {
     Object.keys(this.state.devices).map((key) => {
       const now = Date.now()
       if((now -  this.state.devices[key].updatedTime) > 20*1000) {
-        let oldDevicesList = JSON.parse(JSON.stringify(this.state.devices))
-        delete oldDevicesList[key]
-        const newDevicesList = JSON.parse(JSON.stringify(oldDevicesList))
-        this.setState({devices: {...newDevicesList}})
+        this.removeDevice(key)
       }
     })
   }
