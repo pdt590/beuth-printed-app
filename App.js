@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native';
 import { Container, Header, Button, Icon, Left, Body, Right, Title } from 'native-base'
 import { BleManager } from 'react-native-ble-plx'
 import { Buffer } from 'buffer'
+import Mqtt from 'sp-react-native-mqtt'
 import Card from './components/Card'
 
 export default class App extends Component {
@@ -28,12 +29,83 @@ export default class App extends Component {
     // Waiting for Powered On state in iOS
     if (Platform.OS === 'ios') {
       this.manager.onStateChange((state) => {
-        if (state === 'PoweredOn') this.scanAndConnect()
+        if (state === 'PoweredOn') this.init()
       })
     } else {
-      this.scanAndConnect()
+      this.init()
     }
   }
+
+  /**
+   * MQTT
+   */
+
+  randIdCreator() {
+    const S4 = () =>
+    (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    return `random${S4()}${S4()}${S4()}${S4()}${S4()}${S4()}`;
+  }
+
+  disconnect() {
+    if (this.client) {
+      console.log('MQTT now killing open realtime connection.');
+      this.client.disconnect();
+    }
+  }
+
+  onError(error) {
+    console.log(`MQTT onError: ${error}`);
+  }
+
+  onConnectionOpened() {
+    console.log('MQTT onConnectionOpened');
+    this.scanAndConnect(this.client)
+  }
+
+  onConnectionClosed(err) {
+    console.log(`MQTT onConnectionClosed: ${err}`);
+  }
+
+  onMessageArrived(message) {
+    // TODO
+  }
+
+  init() {
+    this.onConnectionOpened = this.onConnectionOpened.bind(this);
+    this.onConnectionClosed = this.onConnectionClosed.bind(this);
+    this.onError = this.onError.bind(this);
+    this.onMessageArrived = this.onMessageArrived.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+
+    const deviceId = this.randIdCreator().replace(/[^a-zA-Z0-9]+/g, '');
+    const conProps = {
+      uri: 'mqtt://141.64.29.79:1883',
+      clientId: deviceId,
+      auth: true,
+      user: 'mqttuser',
+      pass: 'mqttpassword',
+      clean: true // clean session YES deletes the queue when all clients disconnect
+    }
+    Mqtt.createClient(conProps).then( client => {
+      this.client = client;
+      client.on('closed', this.onConnectionClosed);
+      client.on('error', this.onError);
+      client.on('message', this.onMessageArrived);
+      client.on('connect', this.onConnectionOpened);
+      client.connect();
+    }).catch(err => {
+      console.error(`MQTT createtClient error: ${err}`);
+    });
+  }
+
+  /**
+   * End MQTT
+   */
+
+
+  /**
+   * BLE
+   */
 
   // Setting info messages
   info(message) {
@@ -93,7 +165,7 @@ export default class App extends Component {
   }
 
   // Scanning devices
-  scanAndConnect() {
+  scanAndConnect(mqttClient) {
 
     this.manager.startDeviceScan(null, null, (error, device) => {
       this.info("Scanning...")
@@ -125,7 +197,9 @@ export default class App extends Component {
                 }
                 const buffer = new Buffer(characteristic.value, 'base64')
                 const key = device.id
-                this.updateValue(key, buffer.readFloatLE(0))
+                const value = buffer.readFloatLE(0)
+                this.updateValue(key, value)
+                mqttClient.publish(`sensors/${deviceName}`, value.toString(), 0, false)
               })
           }, (error) => {
             this.error('error 03 - ' + error.message)
@@ -134,6 +208,10 @@ export default class App extends Component {
     });
 
   }
+
+  /**
+   * End BLE
+   */
 
   render() {
     return (
