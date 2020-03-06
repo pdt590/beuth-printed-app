@@ -180,7 +180,7 @@ export default class App extends Component {
       if (deviceName!== null && deviceName.includes("ESP32")) {
         //this.manager.stopDeviceScan()
 
-        device.connect()
+        device.connect({ requestMTU: 256 })
           .then((device) => {
             this.info("Discovering services and characteristics")
             return device.discoverAllServicesAndCharacteristics()
@@ -195,11 +195,11 @@ export default class App extends Component {
                   this.removeDevice(device.id)
                   return
                 }
-                const buffer = new Buffer(characteristic.value, 'base64')
-                const key = device.id
-                const value = buffer.readFloatLE(0)
-                this.updateValue(key, value)
-                mqttClient.publish(`sensors/${deviceName}`, value.toString(), 0, false)
+                const buffer = Buffer.from(characteristic.value, "base64").toString();
+                console.log(JSON.parse(buffer))
+                //const key = device.id
+                //this.updateValue(key, value)
+                //mqttClient.publish(`sensors/${deviceName}`, value.toString(), 0, false)
               })
           }, (error) => {
             this.error('error 03 - ' + error.message)
@@ -223,7 +223,7 @@ export default class App extends Component {
             </Button>  
           </Left>
           <Body>
-            <Title style={{color: 'dimgrey'}}>PrintED Station</Title>
+            <Title style={{color: 'dimgrey'}}>PrintED Care Cloud</Title>
           </Body>
           <Right>
             <Button transparent>
