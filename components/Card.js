@@ -1,40 +1,87 @@
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Content, Text, Icon, Body} from 'native-base';
-import { Col, Row, Grid } from 'react-native-easy-grid';
+import React, {Component} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {Content, Text, Icon, Thumbnail, Body} from 'native-base';
+import {Col, Row, Grid} from 'react-native-easy-grid';
 
 export default class Card extends Component {
   render() {
     return (
       <Content padder>
         <Grid style={styles.card}>
-          <Col size={1} style={styles.mainSection}>
-            <Row >
+          <Col size={2} style={styles.mainSection}>
+            {this.props.isAlarm ? (
+              <Icon
+                type="MaterialCommunityIcons"
+                name="bell-ring"
+                style={{
+                  color: 'dimgray',
+                  fontSize: 40,
+                  position: 'absolute',
+                  top: 10,
+                  left: 10,
+                }}></Icon>
+            ) : null}
+            <Row>
               <Body>
-                <Icon name='thermometer' style={{fontSize: 90, color: 'dimgray', paddingTop: 30}}></Icon>      
+                <Thumbnail
+                  style={styles.avatar}
+                  large
+                  source={{
+                    uri: 'https://picsum.photos/id/237/600/600',
+                  }}
+                />
               </Body>
             </Row>
-            <Row style= {{paddingTop: 15}}>
+            <Row>
               <Body>
-                <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value}°</Text>
+                <Text style={styles.userName}>{this.props.device.name}</Text>
               </Body>
             </Row>
           </Col>
           <Col size={3} style={styles.infoSection}>
-            <Row size={3}>
-              <View>
-                <Text style={{fontSize: 25, color: 'dimgray'}}>{this.props.device.name}</Text>
-                <Text note style={{fontSize: 22}}>Berlin</Text>
-              </View>
+            <Row>
+              <Col style={styles.center}>
+                {/* temp */}
+                <Icon
+                  type="FontAwesome5"
+                  name="thermometer-half"
+                  style={{
+                    color: 'dimgray',
+                    fontSize: 90,
+                  }}></Icon>
+              </Col>
+              <Col style={styles.center}>
+                {/* Action */}
+                <Icon
+                  type="MaterialIcons"
+                  name="airline-seat-flat-angled" 
+                  style={{
+                    color: 'dimgray',
+                    fontSize: 90,
+                  }}></Icon>
+              </Col>
             </Row>
-            <Row size={6} style= {{paddingBottom: 50}}>
-              <Body>
-              </Body>
-            </Row>
-            <Row size={1}>
-              <Body>
-                <Text style={{fontSize: 18}} note>{(new Date(this.props.device.updatedTime)).toLocaleTimeString()}</Text>
-              </Body>
+            <Row>
+              {/* Gas */}
+              <Col style={styles.center}>
+                <Icon
+                  type="Entypo"
+                  name="air"
+                  style={{
+                    color: 'dimgray',
+                    fontSize: 90,
+                  }}></Icon>
+              </Col>
+              <Col style={styles.center}>
+                {/* Hum */}
+                <Icon
+                  type="Entypo"
+                  name="water"
+                  style={{
+                    color: 'dimgray',
+                    fontSize: 90,
+                  }}></Icon>
+              </Col>
             </Row>
           </Col>
         </Grid>
@@ -45,7 +92,7 @@ export default class Card extends Component {
 
 const styles = StyleSheet.create({
   card: {
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 5,
@@ -54,22 +101,116 @@ const styles = StyleSheet.create({
     shadowRadius: 6.27,
     elevation: 10,
     margin: 5,
-    borderColor: '#FFF'
+    borderColor: '#FFF',
+    position: 'relative',
   },
-  mainSection : {
-    backgroundColor: 'yellowgreen', 
+  mainSection: {
+    backgroundColor: '#54c740',
     height: 300,
-    //display: "flex", 
-    //alignItems: "center",
-    //justifyContent: "center",
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
+    paddingTop: 60,
+  },
+  ringIcon: {
+    position: 'absolute',
+  },
+  avatar: {
+    height: 150,
+    width: 150,
+    borderRadius: 180,
+  },
+  userName: {
+    fontSize: 25,
+    color: 'white',
   },
   infoSection: {
     backgroundColor: 'white',
     height: 300,
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
-    padding: 10
-  }
-})
+    padding: 10,
+  },
+  center: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+/*
+  // Action
+  <Icon
+    type="MaterialIcons"
+    name="airline-seat-flat-angled"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>
+  
+  // Temp
+  <Icon
+    type="FontAwesome5"
+    name="thermometer-half"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>
+  
+  // Pressure
+  <Icon
+    type="MaterialCommunityIcons"
+    name="gauge"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>
+
+  <Icon
+    type="Entypo"
+    name="gauge"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>
+  
+  // Air
+  <Icon
+    type="Entypo"
+    name="air"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>
+
+  // Hum
+  <Icon
+    type="Entypo"
+    name="water"
+    style={{
+      color: 'dimgray',
+      fontSize: 90,
+    }}></Icon>              
+*/
+
+/* 
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>
+      {this.props.device.value.state}°
+    </Text>
+  </Body>
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.temp}°</Text>
+  </Body>
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.pres}°</Text>
+  </Body>
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.hum}°</Text>
+  </Body>
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.gas}°</Text>
+  </Body>
+  <Body>
+    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.alt}°</Text>
+  </Body>
+*/
