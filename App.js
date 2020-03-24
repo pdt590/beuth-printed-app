@@ -1,6 +1,35 @@
+import React from "react";
+import HomeScreen from './screens/HomeScreen';
+import SettingScreen from './screens/SettingScreen';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {createDrawerNavigator} from 'react-navigation-drawer';
+
+const DrawerNavigation = createDrawerNavigator(
+  {
+    HomeScreen: HomeScreen,
+    SettingScreen: SettingScreen,
+  },
+  {
+    initialRouteName: 'HomeScreen',
+    contentOptions: {
+      activeTintColor: 'red',
+    },
+  },
+);
+
+const Router = createAppContainer(
+  createSwitchNavigator({
+    DrawerNavigation,
+  }),
+);
+
+export default function App() {
+  return <Router />;
+}
+
+/*
 import React, {Component} from 'react';
 import {ScrollView} from 'react-native';
-
 import {
   Container,
   Header,
@@ -81,9 +110,9 @@ export default class App extends Component {
     }
   }
 
-  /**
-   * MQTT
-   */
+  //
+  // MQTT
+  //
 
   randIdCreator() {
     const S4 = () =>
@@ -145,13 +174,13 @@ export default class App extends Component {
       });
   }
 
-  /**
-   * End MQTT
-   */
+  //
+  // End MQTT
+  //
 
-  /**
-   * BLE
-   */
+  //
+  // BLE
+  //
 
   // Setting info messages
   info(message) {
@@ -271,9 +300,9 @@ export default class App extends Component {
     });
   }
 
-  /**
-   * End BLE
-   */
+  //
+  // End BLE
+  //
 
   render() {
     return (
@@ -309,3 +338,4 @@ export default class App extends Component {
     );
   }
 }
+ */
