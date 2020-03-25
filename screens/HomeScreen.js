@@ -11,19 +11,30 @@ import {
   Title,
 } from 'native-base';
 
-const HomeSceen = ({ navigation }) => {
+const HomeSceen = ({navigation}) => {
   return (
     <Container>
-      <Header>
+      <Header style={{backgroundColor: 'white'}}>
         <Left>
           <Button onPress={() => navigation.toggleDrawer()} transparent>
-            <Icon name="menu" />
+            <Icon
+              name="menu"
+              style={{color: 'dimgrey', fontSize: 40}}></Icon>
           </Button>
         </Left>
         <Body>
-          <Title>Home</Title>
+          <Title style={{color: 'dimgrey', fontSize: 25}}>
+            PRINTED CARE CLOUD
+          </Title>
         </Body>
-        <Right />
+        <Right>
+          <Button transparent>
+            <Icon
+              type="Entypo"
+              name="icloud"
+              style={{color: 'dimgrey', fontSize: 40}}></Icon>
+          </Button>
+        </Right>
       </Header>
     </Container>
   );
