@@ -21,6 +21,7 @@ const DrawerMenu = props => {
             key={item.key}
           />
         )}
+        keyExtractor={(item, index) => index.toString()}
       />
     </View>
   );

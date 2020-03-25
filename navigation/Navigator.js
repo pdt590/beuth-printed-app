@@ -1,7 +1,7 @@
 import React from 'react';
-import HomeScreen from './screens/HomeScreen';
-import SettingScreen from './screens/SettingScreen';
-import DrawerMenu from './components/DrawerMenu';
+import HomeScreen from '../screens/HomeScreen';
+import SettingScreen from '../screens/SettingScreen';
+import DrawerMenu from '../components/DrawerMenu';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {createDrawerNavigator} from 'react-navigation-drawer';
 

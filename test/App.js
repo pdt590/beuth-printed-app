@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, ScrollView} from 'react-native';
+import {ScrollView} from 'react-native';
 import {
   Container,
   Header,
@@ -9,23 +9,30 @@ import {
   Body,
   Right,
   Title,
-  Content,
-  Toast,
 } from 'native-base';
-import Card from '../components/Card';
+import {BleManager} from 'react-native-ble-plx';
+import {Buffer} from 'buffer';
 import Mqtt from 'sp-react-native-mqtt';
+import Card from './components/Card';
 
-export default class HomeScreen extends Component {
-  constructor(props) {
-    super(props);
+export default class App extends Component {
+  constructor() {
+    super();
+
+    this.targetServiceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+    this.targetCharacteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+    // Creating BLE Manager
+    this.manager = new BleManager();
 
     // Creating MQTT Client
     this.client = null;
 
     // state
     this.state = {
+      log: null,
       devices: {
-        'item-01': {
+        '01': {
           name: 'Mr. Muller',
           value: {
             state: 'up',
@@ -37,7 +44,7 @@ export default class HomeScreen extends Component {
           },
           updatedTime: Date.now() - 1,
         },
-        'item-02': {
+        '02': {
           name: 'Ms. Martin',
           value: {
             state: 'up',
@@ -48,14 +55,37 @@ export default class HomeScreen extends Component {
             alt: 90,
           },
           updatedTime: Date.now() - 2,
-        }
+        },
+        '03': {
+          name: 'Mr. Jackson',
+          value: {
+            state: 'down',
+            temp: 23,
+            pres: 100,
+            hum: 50,
+            gas: 60,
+            alt: 90,
+          },
+          updatedTime: Date.now() - 3,
+        },
       },
     };
   }
 
   componentDidMount() {
-    this.init();
+    // Waiting for Powered On state in iOS
+    if (Platform.OS === 'ios') {
+      this.manager.onStateChange(state => {
+        if (state === 'PoweredOn') this.init();
+      });
+    } else {
+      this.init();
+    }
   }
+
+  //
+  // MQTT
+  //
 
   randIdCreator() {
     const S4 = () =>
@@ -72,29 +102,15 @@ export default class HomeScreen extends Component {
 
   onError(error) {
     console.log(`MQTT onError: ${error}`);
-    Toast.show({
-      text: "Error",
-      type: "danger",
-      duration: 5000
-    })
   }
 
   onConnectionOpened() {
     console.log('MQTT onConnectionOpened');
-    Toast.show({
-      text: "Connect Successfully",
-      type: "success",
-      duration: 5000
-    })
+    this.scanAndConnect(this.client);
   }
 
   onConnectionClosed(err) {
     console.log(`MQTT onConnectionClosed: ${err}`);
-    Toast.show({
-      text: "Connection Closed",
-      type: "warning",
-      duration: 5000
-    })
   }
 
   onMessageArrived(message) {
@@ -110,11 +126,11 @@ export default class HomeScreen extends Component {
 
     const deviceId = this.randIdCreator().replace(/[^a-zA-Z0-9]+/g, '');
     const conProps = {
-      uri: 'mqtt://192.168.2.162:1883',
+      uri: 'mqtt://141.64.29.79:1883',
       clientId: deviceId,
-      //auth: true,
-      //user: 'mqttuser',
-      //pass: 'mqttpassword',
+      auth: true,
+      user: 'mqttuser',
+      pass: 'mqttpassword',
       clean: true, // clean session YES deletes the queue when all clients disconnect
     };
     Mqtt.createClient(conProps)
@@ -131,6 +147,25 @@ export default class HomeScreen extends Component {
       });
   }
 
+  //
+  // End MQTT
+  //
+
+  //
+  // BLE
+  //
+
+  // Setting info messages
+  info(message) {
+    this.setState({log: '[INFO] ' + message});
+    console.log(this.state.log);
+  }
+
+  error(message) {
+    this.setState({log: '[ERROR] ' + message});
+    console.log(this.state.log);
+  }
+
   // Updating value
   updateValue(key, value) {
     if (key in this.state.devices) {
@@ -144,6 +179,7 @@ export default class HomeScreen extends Component {
           },
         },
       });
+      //console.log('updateValue', this.state.devices)
     }
   }
 
@@ -184,15 +220,73 @@ export default class HomeScreen extends Component {
     this.setState({devices: {...newDevicesList}});
   }
 
+  // Scanning devices
+  scanAndConnect(mqttClient) {
+    this.manager.startDeviceScan(null, null, (error, device) => {
+      this.info('Scanning...');
+      if (error) {
+        this.error('error 01 - ' + error.message);
+        return;
+      }
+
+      //this.checkDevices()
+
+      const deviceName = device.name;
+      if (deviceName !== null && deviceName.includes('ESP32')) {
+        //this.manager.stopDeviceScan()
+
+        device
+          .connect({requestMTU: 256})
+          .then(device => {
+            this.info('Discovering services and characteristics');
+            return device.discoverAllServicesAndCharacteristics();
+          })
+          .then(
+            device => {
+              this.info('Setting notifications');
+              this.updateDevice(device);
+              device.monitorCharacteristicForService(
+                this.targetServiceUUID,
+                this.targetCharacteristicUUID,
+                (error, characteristic) => {
+                  if (error) {
+                    this.error('error 02 - ' + error.message);
+                    this.removeDevice(device.id);
+                    return;
+                  }
+                  const buffer = Buffer.from(
+                    characteristic.value,
+                    'base64',
+                  ).toString();
+                  console.log(JSON.parse(buffer));
+                  //const key = device.id
+                  //this.updateValue(key, value)
+                  //mqttClient.publish(`sensors/${deviceName}`, value.toString(), 0, false)
+                },
+              );
+            },
+            error => {
+              this.error('error 03 - ' + error.message);
+            },
+          );
+      }
+    });
+  }
+
+  //
+  // End BLE
+  //
+
   render() {
     return (
       <Container>
         <Header style={{backgroundColor: 'white'}}>
           <Left>
-            <Button
-              onPress={() => this.props.navigation.toggleDrawer()}
-              transparent>
-              <Icon name="menu" style={{color: 'dimgrey', fontSize: 40}}></Icon>
+            <Button transparent>
+              <Icon
+                type="AntDesign"
+                name="bars"
+                style={{color: 'dimgrey', fontSize: 40}}></Icon>
             </Button>
           </Left>
           <Body>
@@ -220,5 +314,3 @@ export default class HomeScreen extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({});
