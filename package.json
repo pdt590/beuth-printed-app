@@ -23,8 +23,7 @@
     "react-navigation": "^4.3.3",
     "react-navigation-drawer": "^2.4.7",
     "sp-react-native-mqtt": "^0.4.25",
-    "underscore": "^1.9.1",
-    "victory-native": "^33.0.0"
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "@babel/core": "7.6.0",

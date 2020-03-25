@@ -21,7 +21,7 @@ const SettingSceen = ({ navigation }) => {
           </Button>
         </Left>
         <Body>
-          <Title>Header</Title>
+          <Title>Setting</Title>
         </Body>
         <Right />
       </Header>

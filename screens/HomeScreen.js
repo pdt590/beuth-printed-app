@@ -21,7 +21,7 @@ const HomeSceen = ({ navigation }) => {
           </Button>
         </Left>
         <Body>
-          <Title>Header</Title>
+          <Title>Home</Title>
         </Body>
         <Right />
       </Header>
