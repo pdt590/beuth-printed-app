@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, ScrollView} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
+
 import {
   Container,
   Header,
@@ -19,7 +21,7 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
-    // Creating MQTT Client
+    this.connectionStatus = false;
     this.client = null;
 
     // state
@@ -48,13 +50,41 @@ export default class HomeScreen extends Component {
             alt: 90,
           },
           updatedTime: Date.now() - 2,
-        }
+        },
       },
     };
   }
 
   componentDidMount() {
-    this.init();
+    //this.init();
+    this.netinfoUnsubscribe = NetInfo.addEventListener(state => {
+      // There is Call twice issue
+      //if (state.type === 'wifi') {
+        if (state.isConnected) {
+          console.log('You are online!');
+          if (this.connectionStatus !== state.isConnected) {
+            this.init();
+            this.connectionStatus = state.isConnected;
+          }
+        } else {
+          console.log('You are offline!');
+          this.connectionStatus = false;
+          Toast.show({
+            text: 'Wifi Disconnected',
+            type: 'danger',
+            duration: 3000,
+          });
+        }
+      //}
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.netinfoUnsubscribe) {
+      this.netinfoUnsubscribe();
+      this.netinfoUnsubscribe = null;
+      this.connectionStatus = false;
+    }
   }
 
   randIdCreator() {
@@ -71,30 +101,30 @@ export default class HomeScreen extends Component {
   }
 
   onError(error) {
-    console.log(`MQTT onError: ${error}`);
+    console.log(`MQTT onErrorr: ${error}`);
     Toast.show({
-      text: "Error",
-      type: "danger",
-      duration: 5000
-    })
+      text: 'Error',
+      type: 'danger',
+      duration: 3000,
+    });
   }
 
   onConnectionOpened() {
     console.log('MQTT onConnectionOpened');
     Toast.show({
-      text: "Connect Successfully",
-      type: "success",
-      duration: 5000
-    })
+      text: 'Connect Successfully',
+      type: 'success',
+      duration: 3000,
+    });
   }
 
   onConnectionClosed(err) {
     console.log(`MQTT onConnectionClosed: ${err}`);
     Toast.show({
-      text: "Connection Closed",
-      type: "warning",
-      duration: 5000
-    })
+      text: 'Connection Closed',
+      type: 'warning',
+      duration: 3000,
+    });
   }
 
   onMessageArrived(message) {
@@ -161,7 +191,6 @@ export default class HomeScreen extends Component {
           },
         },
       });
-      //console.log('updateDevice', this.state.devices)
     }
   }
 

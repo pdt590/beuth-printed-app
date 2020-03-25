@@ -1,10 +1,10 @@
 import React from 'react';
-import {useScreens} from 'react-native-screens';
+import {enableScreens} from 'react-native-screens';
 import {Root} from 'native-base';
 
 import Navigator from './navigation/Navigator';
 
-useScreens();
+enableScreens();
 
 export default function App() {
   return (
