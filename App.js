@@ -1,33 +1,12 @@
 import React from "react";
-import HomeScreen from './screens/HomeScreen';
-import SettingScreen from './screens/SettingScreen';
-import DrawerMenu from './components/DrawerMenu';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {createDrawerNavigator} from 'react-navigation-drawer';
+import { useScreens } from 'react-native-screens';
 
-const DrawerNavigation = createDrawerNavigator(
-  {
-    HomeScreen: HomeScreen,
-    SettingScreen: SettingScreen,
-  },
-  {
-    initialRouteName: 'HomeScreen',
-    drawerBackgroundColor: "lightblue",
-    contentOptions: {
-      activeTintColor: 'red',
-    },
-    contentComponent: DrawerMenu
-  },
-);
+import Navigator from './navigation/Navigator';
 
-const Router = createAppContainer(
-  createSwitchNavigator({
-    DrawerNavigation,
-  }),
-);
+useScreens();
 
 export default function App() {
-  return <Router />;
+  return <Navigator />;
 }
 
 /*
