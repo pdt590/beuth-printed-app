@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import {CHANGE_SETTING} from '../../constants/action_types';
 
 let INITIAL_STATE = {

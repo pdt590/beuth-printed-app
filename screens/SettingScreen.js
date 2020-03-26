@@ -154,7 +154,6 @@ class SettingScreen extends Component {
             block
             style={styles.button}
             onPress={() => {
-              console.log('SettingScreen', this.state);
               this.props.changeSetting(this.state);
             }}>
             <Text>Save</Text>

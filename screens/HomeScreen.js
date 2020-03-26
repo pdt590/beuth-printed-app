@@ -244,8 +244,6 @@ class HomeScreen extends Component {
           </Right>
         </Header>
         <Content>
-          {console.log('HomeScreen', this.props.settings)}
-          {console.log('HomeScreen', this.props.devices)}
           <ScrollView>
             {Object.keys(this.props.devices).map(key => {
               return <Card key={key} device={this.props.devices[key]} />;
