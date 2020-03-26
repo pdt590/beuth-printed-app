@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, ScrollView} from 'react-native';
+import {StyleSheet, ScrollView, FlatList} from 'react-native';
 import {
   Container,
   Header,
@@ -18,7 +18,11 @@ import Mqtt from 'sp-react-native-mqtt';
 import NetInfo from '@react-native-community/netinfo';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {addDevice, removeDevice} from '../store/actions/DeviceActions';
+import {
+  addDevice,
+  removeDevice,
+  updateDevice,
+} from '../store/actions/DeviceActions';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -26,6 +30,7 @@ class HomeScreen extends Component {
 
     this.connectionStatus = false;
     this.client = null;
+    this.timerId = null;
   }
 
   componentDidUpdate(prevProps) {
@@ -77,6 +82,7 @@ class HomeScreen extends Component {
   disconnect() {
     if (this.client) {
       console.log('MQTT now killing open realtime connection.');
+      clearInterval(this.timerId);
       this.client.disconnect();
     }
   }
@@ -97,10 +103,13 @@ class HomeScreen extends Component {
       type: 'success',
       duration: 5000,
     });
+    this.client.subscribe('devices/#', 0);
+    this.timerId = setInterval(this.onDevicesListener.bind(this), 10000);
   }
 
   onConnectionClosed(err) {
     console.log(`MQTT onConnectionClosed: ${err}`);
+    clearInterval(this.timerId);
     Toast.show({
       text: 'Connection Closed',
       type: 'warning',
@@ -109,7 +118,8 @@ class HomeScreen extends Component {
   }
 
   onMessageArrived(message) {
-    // TODO
+    const device = JSON.parse(message.data);
+    this.onMessageProcess(device);
   }
 
   init() {
@@ -142,57 +152,36 @@ class HomeScreen extends Component {
       });
   }
 
-  /* // Updating value
-  updateValue(key, value) {
-    if (key in this.state.devices) {
-      this.setState({
-        devices: {
-          ...this.state.devices,
-          [key]: {
-            name: this.state.devices[key].name,
-            value: value,
-            updatedTime: Date.now(),
-          },
-        },
-      });
-    }
-  }
-
   // Updating device
-  updateDevice(device) {
-    const key = device.id;
-    if (!(key in this.state.devices)) {
-      this.setState({
-        devices: {
-          ...this.state.devices,
-          [key]: {
-            name: device.name,
-            value: null,
-            updatedTime: Date.now(),
-          },
-        },
+  onMessageProcess(device) {
+    if (
+      !this.props.devices.activeDevices.find(
+        activeDevice => device.name === activeDevice.name,
+      )
+    ) {
+      this.props.addDevice({
+        ...device,
+        updatedTime: Date.now(),
+      });
+    } else {
+      this.props.updateDevice({
+        ...device,
+        updatedTime: Date.now(),
       });
     }
   }
 
   // Checking devices
-  checkDevices() {
-    if (this.state.devices === {}) return;
-    Object.keys(this.state.devices).map(key => {
+  onDevicesListener() {
+    const activeDevices = this.props.devices.activeDevices;
+    if (!activeDevices.length) return;
+    for (const device of activeDevices) {
       const now = Date.now();
-      if (now - this.state.devices[key].updatedTime > 20 * 1000) {
-        this.removeDevice(key);
+      if (now - device.updatedTime > 20 * 1000) {
+        this.props.removeDevice(device);
       }
-    });
+    }
   }
-
-  // Removing device
-  removeDevice(key) {
-    let oldDevicesList = JSON.parse(JSON.stringify(this.state.devices));
-    delete oldDevicesList[key];
-    const newDevicesList = JSON.parse(JSON.stringify(oldDevicesList));
-    this.setState({devices: {...newDevicesList}});
-  } */
 
   render() {
     return (
@@ -220,11 +209,12 @@ class HomeScreen extends Component {
           </Right>
         </Header>
         <Content>
-          <ScrollView>
-            {Object.keys(this.props.devices).map(key => {
-              return <Card key={key} device={this.props.devices[key]} />;
-            })}
-          </ScrollView>
+          <FlatList
+            data={this.props.devices.activeDevices}
+            extraData={this.props.devices}
+            renderItem={({item}) => <Card key={item.id} device={item} />}
+            keyExtractor={(item, index) => index.toString()}
+          />
         </Content>
       </Container>
     );
@@ -243,6 +233,7 @@ const mapDispatchToProps = dispatch =>
     {
       addDevice,
       removeDevice,
+      updateDevice,
     },
     dispatch,
   );
