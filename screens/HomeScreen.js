@@ -20,7 +20,6 @@ import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { addDevice, removeDevice } from '../store/actions/DeviceActions';
 
-
 class HomeScreen extends Component {
   constructor(props) {
     super(props);

@@ -1,3 +1,5 @@
+import {ADD_DEVICE, REMOVE_DEVICE} from '../../constants/action_types'
+
 const INITIAL_STATE = {
   '01': {
     name: 'Mr. Muller',
@@ -27,8 +29,8 @@ const INITIAL_STATE = {
 
 const deviceReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'ADD_DEVICE':
-    case 'REMOVE_DEVICE':
+    case ADD_DEVICE:
+    case REMOVE_DEVICE:
     default:
       return state;
   }

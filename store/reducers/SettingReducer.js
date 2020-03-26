@@ -1,3 +1,5 @@
+import {CHANGE_SETTING} from '../../constants/action_types'
+
 const INITIAL_STATE = {
   mqtt_server: '192.168.2.162',
   targetServiceUUID: '',
@@ -10,7 +12,7 @@ const INITIAL_STATE = {
 
 const settingReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case 'CHANGE_SETTING':
+    case CHANGE_SETTING:
     default:
       return state;
   }
