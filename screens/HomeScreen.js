@@ -17,8 +17,8 @@ import Card from '../components/Card';
 import Mqtt from 'sp-react-native-mqtt';
 import NetInfo from '@react-native-community/netinfo';
 import {connect} from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { addDevice, removeDevice } from '../store/actions/DeviceActions';
+import {bindActionCreators} from 'redux';
+import {addDevice, removeDevice} from '../store/actions/DeviceActions';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -115,10 +115,11 @@ class HomeScreen extends Component {
 
   onConnectionOpened() {
     console.log('MQTT onConnectionOpened');
+    alert('Connect Successfully')
     Toast.show({
       text: 'Connect Successfully',
       type: 'success',
-      duration: 3000,
+      duration: 5000,
     });
   }
 
@@ -144,11 +145,11 @@ class HomeScreen extends Component {
 
     const deviceId = this.randIdCreator().replace(/[^a-zA-Z0-9]+/g, '');
     const conProps = {
-      uri: 'mqtt://192.168.2.162:1883',
+      uri: `mqtt://${this.props.settings.mqtt_server}:1883`,
       clientId: deviceId,
-      //auth: true,
-      //user: 'mqttuser',
-      //pass: 'mqttpassword',
+      auth: this.props.settings.mqtt_isAuth,
+      user: this.props.settings.mqtt_user,
+      pass: this.props.settings.mqtt_pass,
       clean: true, // clean session YES deletes the queue when all clients disconnect
     };
     Mqtt.createClient(conProps)
@@ -243,6 +244,8 @@ class HomeScreen extends Component {
           </Right>
         </Header>
         <Content>
+          {console.log('HomeScreen', this.props.settings)}
+          {console.log('HomeScreen', this.props.devices)}
           <ScrollView>
             {Object.keys(this.props.devices).map(key => {
               return <Card key={key} device={this.props.devices[key]} />;
@@ -257,15 +260,17 @@ class HomeScreen extends Component {
 const styles = StyleSheet.create({});
 
 const mapStateToProps = state => {
-  const {devices} = state;
-  return {devices};
+  const {devices, settings} = state;
+  return {devices, settings};
 };
 
-const mapDispatchToProps = dispatch => (
-  bindActionCreators({
-    addDevice,
-    removeDevice
-  }, dispatch)
-);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      addDevice,
+      removeDevice,
+    },
+    dispatch,
+  );
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
