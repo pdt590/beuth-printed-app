@@ -11,7 +11,7 @@ const DrawerNavigation = createDrawerNavigator(
     SettingScreen: SettingScreen,
   },
   {
-    initialRouteName: 'SettingScreen',
+    initialRouteName: 'HomeScreen',
     drawerBackgroundColor: 'lightblue',
     contentOptions: {
       activeTintColor: 'red',

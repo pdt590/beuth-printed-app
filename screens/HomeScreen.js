@@ -26,36 +26,13 @@ class HomeScreen extends Component {
 
     this.connectionStatus = false;
     this.client = null;
+  }
 
-    // state
-    this.state = {
-      devices: {
-        'item-01': {
-          name: 'Mr. Muller',
-          value: {
-            state: 'up',
-            temp: 23,
-            pres: 100,
-            hum: 50,
-            gas: 60,
-            alt: 90,
-          },
-          updatedTime: Date.now() - 1,
-        },
-        'item-02': {
-          name: 'Ms. Martin',
-          value: {
-            state: 'up',
-            temp: 23,
-            pres: 100,
-            hum: 50,
-            gas: 60,
-            alt: 90,
-          },
-          updatedTime: Date.now() - 2,
-        },
-      },
-    };
+  componentDidUpdate(prevProps) {
+    if (this.props.settings !== prevProps.settings) {
+      this.disconnect();
+      this.init();
+    }
   }
 
   componentDidMount() {
@@ -76,7 +53,7 @@ class HomeScreen extends Component {
         Toast.show({
           text: 'Wifi Disconnected',
           type: 'danger',
-          duration: 3000,
+          duration: 5000,
         });
       }
       //}
@@ -109,13 +86,12 @@ class HomeScreen extends Component {
     Toast.show({
       text: 'Error',
       type: 'danger',
-      duration: 3000,
+      duration: 5000,
     });
   }
 
   onConnectionOpened() {
     console.log('MQTT onConnectionOpened');
-    alert('Connect Successfully')
     Toast.show({
       text: 'Connect Successfully',
       type: 'success',
@@ -128,7 +104,7 @@ class HomeScreen extends Component {
     Toast.show({
       text: 'Connection Closed',
       type: 'warning',
-      duration: 3000,
+      duration: 5000,
     });
   }
 
@@ -147,7 +123,7 @@ class HomeScreen extends Component {
     const conProps = {
       uri: `mqtt://${this.props.settings.mqtt_server}:1883`,
       clientId: deviceId,
-      auth: this.props.settings.mqtt_isAuth,
+      auth: this.props.settings.mqtt_auth,
       user: this.props.settings.mqtt_user,
       pass: this.props.settings.mqtt_pass,
       clean: true, // clean session YES deletes the queue when all clients disconnect
@@ -166,7 +142,7 @@ class HomeScreen extends Component {
       });
   }
 
-  // Updating value
+  /* // Updating value
   updateValue(key, value) {
     if (key in this.state.devices) {
       this.setState({
@@ -216,7 +192,7 @@ class HomeScreen extends Component {
     delete oldDevicesList[key];
     const newDevicesList = JSON.parse(JSON.stringify(oldDevicesList));
     this.setState({devices: {...newDevicesList}});
-  }
+  } */
 
   render() {
     return (
