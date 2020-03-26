@@ -16,8 +16,11 @@ import {
   Text,
   Separator
 } from 'native-base';
+import {connect} from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { changeSetting } from '../store/actions/SettingActions';
 
-export default class SettingScreen extends Component {
+class SettingScreen extends Component {
   render() {
     return (
       <Container>
@@ -82,3 +85,16 @@ const styles = StyleSheet.create({
     margin: 20,
   },
 });
+
+const mapStateToProps = state => {
+  const {settings} = state;
+  return {settings};
+};
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+    changeSetting
+  }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingScreen);

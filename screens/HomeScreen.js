@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import {StyleSheet, ScrollView} from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
-
 import {
   Container,
   Header,
@@ -13,11 +11,17 @@ import {
   Title,
   Content,
   Toast,
+  Text,
 } from 'native-base';
 import Card from '../components/Card';
 import Mqtt from 'sp-react-native-mqtt';
+import NetInfo from '@react-native-community/netinfo';
+import {connect} from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { addDevice, removeDevice } from '../store/actions/DeviceActions';
 
-export default class HomeScreen extends Component {
+
+class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
@@ -58,23 +62,24 @@ export default class HomeScreen extends Component {
   componentDidMount() {
     //this.init();
     this.netinfoUnsubscribe = NetInfo.addEventListener(state => {
+      // TODO
       // There is Call twice issue
       //if (state.type === 'wifi') {
-        if (state.isConnected) {
-          console.log('You are online!');
-          if (this.connectionStatus !== state.isConnected) {
-            this.init();
-            this.connectionStatus = state.isConnected;
-          }
-        } else {
-          console.log('You are offline!');
-          this.connectionStatus = false;
-          Toast.show({
-            text: 'Wifi Disconnected',
-            type: 'danger',
-            duration: 3000,
-          });
+      if (state.isConnected) {
+        console.log('You are online!');
+        if (this.connectionStatus !== state.isConnected) {
+          this.init();
+          this.connectionStatus = state.isConnected;
         }
+      } else {
+        console.log('You are offline!');
+        this.connectionStatus = false;
+        Toast.show({
+          text: 'Wifi Disconnected',
+          type: 'danger',
+          duration: 3000,
+        });
+      }
       //}
     });
   }
@@ -240,8 +245,8 @@ export default class HomeScreen extends Component {
         </Header>
         <Content>
           <ScrollView>
-            {Object.keys(this.state.devices).map(key => {
-              return <Card key={key} device={this.state.devices[key]} />;
+            {Object.keys(this.props.devices).map(key => {
+              return <Card key={key} device={this.props.devices[key]} />;
             })}
           </ScrollView>
         </Content>
@@ -251,3 +256,17 @@ export default class HomeScreen extends Component {
 }
 
 const styles = StyleSheet.create({});
+
+const mapStateToProps = state => {
+  const {devices} = state;
+  return {devices};
+};
+
+const mapDispatchToProps = dispatch => (
+  bindActionCreators({
+    addDevice,
+    removeDevice
+  }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
