@@ -81,16 +81,16 @@ class HomeScreen extends Component {
 
   disconnect() {
     if (this.client) {
-      console.log('MQTT now killing open realtime connection.');
+      console.log('Killing connection.');
       clearInterval(this.timerId);
       this.client.disconnect();
     }
   }
 
   onError(error) {
-    console.log(`MQTT onErrorr: ${error}`);
+    console.log(`MQTT onError: ${error}`);
     Toast.show({
-      text: 'Error',
+      text: 'Error! Check Internet Connection',
       type: 'danger',
       duration: 5000,
     });
