@@ -15,6 +15,7 @@ import {
   Switch,
   Item,
   Input,
+  Label,
   Text,
   Separator,
 } from 'native-base';
@@ -49,11 +50,20 @@ class SettingScreen extends Component {
             <Separator bordered>
               <Text style={{fontSize: 15}}>MQTT SETTING</Text>
             </Separator>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>MQTT Server IP</Label>
               <Input
-                placeholder="MQTT Server IP"
                 onChangeText={newIp => this.setState({mqtt_server: newIp})}
                 value={this.state.mqtt_server}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Subscribe Topic</Label>
+              <Input
+                onChangeText={newTopic =>
+                  this.setState({mqtt_subtopic: newTopic})
+                }
+                value={this.state.mqtt_subtopic}
               />
             </Item>
 
@@ -71,17 +81,17 @@ class SettingScreen extends Component {
               </Right>
             </ListItem>
 
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Username</Label>
               <Input
-                placeholder="Username"
                 disabled={!this.state.mqtt_auth}
                 onChangeText={newUser => this.setState({mqtt_user: newUser})}
                 defaultValue={this.state.mqtt_user}
               />
             </Item>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Password</Label>
               <Input
-                placeholder="Password"
                 disabled={!this.state.mqtt_auth}
                 onChangeText={newPass => this.setState({mqtt_pass: newPass})}
                 defaultValue={this.state.mqtt_pass}
@@ -91,18 +101,18 @@ class SettingScreen extends Component {
             <Separator bordered>
               <Text style={{fontSize: 15}}>BLE SETTING</Text>
             </Separator>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>BLE Service UUID Target</Label>
               <Input
-                placeholder="BLE Service UUID Target"
                 onChangeText={newUUID =>
                   this.setState({targetServiceUUID: newUUID})
                 }
                 defaultValue={this.state.targetServiceUUID}
               />
             </Item>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>BLE Characteristic UUID Target</Label>
               <Input
-                placeholder="BLE Characteristic UUID Target"
                 onChangeText={newUUID =>
                   this.setState({targetCharacteristicUUID: newUUID})
                 }
@@ -111,38 +121,58 @@ class SettingScreen extends Component {
             </Item>
 
             <Separator bordered>
+              <Text style={{fontSize: 15}}>DISPLAY SETTING</Text>
+            </Separator>
+            <Item stackedLabel style={styles.input}>
+              <Label>Refresh Interval</Label>
+              <Input
+                onChangeText={newInterval =>
+                  this.setState({interval: newInterval})
+                }
+                defaultValue={this.state.interval}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Alive Device Time</Label>
+              <Input
+                onChangeText={newTime => this.setState({alive_time: newTime})}
+                defaultValue={this.state.alive_time}
+              />
+            </Item>
+
+            <Separator bordered>
               <Text style={{fontSize: 15}}>DATA SETTING</Text>
             </Separator>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Temperature Threshold</Label>
               <Input
-                placeholder="Temperature Threshold"
                 onChangeText={newThreshold =>
                   this.setState({temp_threshold: newThreshold})
                 }
                 defaultValue={this.state.temp_threshold}
               />
             </Item>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Pressure Threshold</Label>
               <Input
-                placeholder="Pressure Threshold"
                 onChangeText={newThreshold =>
                   this.setState({pressure_threshold: newThreshold})
                 }
                 defaultValue={this.state.pressure_threshold}
               />
             </Item>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Gas Threshold</Label>
               <Input
-                placeholder="Gas Threshold"
                 onChangeText={newThreshold =>
                   this.setState({gas_threshold: newThreshold})
                 }
                 defaultValue={this.state.gas_threshold}
               />
             </Item>
-            <Item regular style={styles.input}>
+            <Item stackedLabel style={styles.input}>
+              <Label>Humidity Threshold</Label>
               <Input
-                placeholder="Humidity Threshold"
                 onChangeText={newThreshold =>
                   this.setState({hum_threshold: newThreshold})
                 }

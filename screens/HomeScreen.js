@@ -103,8 +103,8 @@ class HomeScreen extends Component {
       type: 'success',
       duration: 5000,
     });
-    this.client.subscribe('devices/#', 0);
-    this.timerId = setInterval(this.onDevicesListener.bind(this), 10000);
+    this.client.subscribe(this.props.settings.mqtt_subtopic, 0);
+    this.timerId = setInterval(this.onDevicesListener.bind(this), Number(this.props.settings.interval));
   }
 
   onConnectionClosed(err) {
@@ -177,7 +177,7 @@ class HomeScreen extends Component {
     if (!activeDevices.length) return;
     for (const device of activeDevices) {
       const now = Date.now();
-      if (now - device.updatedTime > 20 * 1000) {
+      if (now - device.updatedTime > Number(this.props.settings.alive_time) * 1000) {
         this.props.removeDevice(device);
       }
     }
