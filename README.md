@@ -5,7 +5,7 @@ Android and iOS application for PrintED project
 ## Compatibility
 
 - Node v10.18.1
-- [beuth-printed-sensor/clip](https://github.com/pdthang/beuth-printed-sensor/tree/clip) using LIS3DH and BME680 sensors
+- [beuth-printed-sensor-fw/clip](https://github.com/pdthang/beuth-printed-sensor-fw/tree/clip) using LIS3DH and BME680 sensors
 - [beuth-printed-app/clip](https://github.com/pdt590/beuth-printed-app)
 - [beuth-printed-gateway/master](https://github.com/pdt590/beuth-printed-gateway)
 - [beuth-printed-cloud/master](https://github.com/pdt590/beuth-printed-cloud)
