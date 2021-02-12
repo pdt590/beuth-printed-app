@@ -1,19 +1,19 @@
 import {CHANGE_SETTING} from '../../constants/action_types';
 
 let INITIAL_STATE = {
-  mqtt_server: '192.168.2.162',
-  mqtt_auth: false,
-  mqtt_user: '',
-  mqtt_pass: '',
-  mqtt_subtopic: 'devices/#',
+  mqtt_server: '141.64.29.79',
+  mqtt_auth: true,
+  mqtt_user: 'mqttuser',
+  mqtt_pass: 'mqttpassword',
+  mqtt_subtopic: 'sensors/test',
   targetServiceUUID: '',
   targetCharacteristicUUID: '',
   interval: '20',
-  alive_time: '10',
-  temp_threshold: '',
-  pressure_threshold: '',
-  gas_threshold: '',
-  hum_threshold: '',
+  alive_time: '15',
+  temp_threshold: '0',
+  pressure_threshold: '0',
+  gas_threshold: '0',
+  hum_threshold: '0',
 };
 
 const settingReducer = (state = INITIAL_STATE, action) => {

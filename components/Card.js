@@ -27,7 +27,7 @@ export default class Card extends Component {
                   style={styles.avatar}
                   large
                   source={{
-                    uri: 'https://picsum.photos/id/237/600/600',
+                    uri: 'https://picsum.photos/id/1027/600/600',
                   }}
                 />
               </Body>
@@ -41,46 +41,90 @@ export default class Card extends Component {
           <Col size={3} style={styles.infoSection}>
             <Row>
               <Col style={styles.center}>
-                {/* temp */}
-                <Icon
-                  type="FontAwesome5"
-                  name="thermometer-half"
-                  style={{
-                    color: 'dimgray',
-                    fontSize: 90,
-                  }}></Icon>
+                <Row>
+                  {/* Temp */}
+                  <Icon
+                    type="FontAwesome5"
+                    name="thermometer-half"
+                    style={{
+                      color:
+                        this.props.device.temp >
+                        Number(this.props.settings.temp_threshold)
+                          ? 'red'
+                          : 'dimgray',
+                      fontSize: 90,
+                      height: 100,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text>(Temp) {this.props.device.temp} °C</Text>
+                  </Body>
+                </Row>
               </Col>
               <Col style={styles.center}>
-                {/* Action */}
-                <Icon
-                  type="MaterialIcons"
-                  name="airline-seat-flat-angled" 
-                  style={{
-                    color: 'dimgray',
-                    fontSize: 90,
-                  }}></Icon>
+                <Row>
+                  {/* Position */}
+                  <Icon
+                    type="MaterialIcons"
+                    name="airline-seat-flat-angled"
+                    style={{
+                      color: 'dimgray',
+                      fontSize: 90,
+                      height: 100,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text>(Position) Sleep</Text>
+                  </Body>
+                </Row>
               </Col>
             </Row>
             <Row>
-              {/* Gas */}
               <Col style={styles.center}>
-                <Icon
-                  type="Entypo"
-                  name="air"
-                  style={{
-                    color: 'dimgray',
-                    fontSize: 90,
-                  }}></Icon>
+                <Row>
+                  {/* Gas */}
+                  <Icon
+                    type="Entypo"
+                    name="air"
+                    style={{
+                      color:
+                        this.props.device.gas >
+                        Number(this.props.settings.gas_threshold)
+                          ? 'red'
+                          : 'dimgray',
+                      fontSize: 90,
+                      height: 100,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text>(Gas) {this.props.device.gas} Ohms</Text>
+                  </Body>
+                </Row>
               </Col>
               <Col style={styles.center}>
-                {/* Hum */}
-                <Icon
-                  type="Entypo"
-                  name="water"
-                  style={{
-                    color: 'dimgray',
-                    fontSize: 90,
-                  }}></Icon>
+                <Row>
+                  {/* Hum */}
+                  <Icon
+                    type="Entypo"
+                    name="water"
+                    style={{
+                      color:
+                        this.props.device.hum >
+                        Number(this.props.settings.hum_threshold)
+                          ? 'red'
+                          : 'dimgray',
+                      fontSize: 90,
+                      height: 100,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text>(Humidity) {this.props.device.hum} %</Text>
+                  </Body>
+                </Row>
               </Col>
             </Row>
           </Col>

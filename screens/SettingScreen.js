@@ -124,7 +124,7 @@ class SettingScreen extends Component {
               <Text style={{fontSize: 15}}>DISPLAY SETTING</Text>
             </Separator>
             <Item stackedLabel style={styles.input}>
-              <Label>Refresh Interval</Label>
+              <Label>Refreshed Device List Interval</Label>
               <Input
                 onChangeText={newInterval =>
                   this.setState({interval: newInterval})
@@ -133,7 +133,7 @@ class SettingScreen extends Component {
               />
             </Item>
             <Item stackedLabel style={styles.input}>
-              <Label>Alive Device Time</Label>
+              <Label>Refreshed Device Time</Label>
               <Input
                 onChangeText={newTime => this.setState({alive_time: newTime})}
                 defaultValue={this.state.alive_time}

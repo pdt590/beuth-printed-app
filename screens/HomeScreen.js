@@ -42,7 +42,7 @@ class HomeScreen extends Component {
 
   componentDidMount() {
     //this.init();
-    this.netinfoUnsubscribe = NetInfo.addEventListener(state => {
+    this.netinfoUnsubscribe = NetInfo.addEventListener((state) => {
       // TODO
       // There is Call twice issue
       //if (state.type === 'wifi') {
@@ -104,7 +104,10 @@ class HomeScreen extends Component {
       duration: 5000,
     });
     this.client.subscribe(this.props.settings.mqtt_subtopic, 0);
-    this.timerId = setInterval(this.onDevicesListener.bind(this), Number(this.props.settings.interval));
+    this.timerId = setInterval(
+      this.onDevicesListener.bind(this),
+      Number(this.props.settings.interval),
+    );
   }
 
   onConnectionClosed(err) {
@@ -139,7 +142,7 @@ class HomeScreen extends Component {
       clean: true, // clean session YES deletes the queue when all clients disconnect
     };
     Mqtt.createClient(conProps)
-      .then(client => {
+      .then((client) => {
         this.client = client;
         client.on('closed', this.onConnectionClosed);
         client.on('error', this.onError);
@@ -147,7 +150,7 @@ class HomeScreen extends Component {
         client.on('connect', this.onConnectionOpened);
         client.connect();
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(`MQTT createtClient error: ${err}`);
       });
   }
@@ -156,7 +159,7 @@ class HomeScreen extends Component {
   onMessageProcess(device) {
     if (
       !this.props.devices.activeDevices.find(
-        activeDevice => device.name === activeDevice.name,
+        (activeDevice) => device.name === activeDevice.name,
       )
     ) {
       this.props.addDevice({
@@ -177,7 +180,10 @@ class HomeScreen extends Component {
     if (!activeDevices.length) return;
     for (const device of activeDevices) {
       const now = Date.now();
-      if (now - device.updatedTime > Number(this.props.settings.alive_time) * 1000) {
+      if (
+        now - device.updatedTime >
+        Number(this.props.settings.alive_time) * 1000
+      ) {
         this.props.removeDevice(device);
       }
     }
@@ -212,7 +218,13 @@ class HomeScreen extends Component {
           <FlatList
             data={this.props.devices.activeDevices}
             extraData={this.props.devices}
-            renderItem={({item}) => <Card key={item.id} device={item} />}
+            renderItem={({item}) => (
+              <Card
+                key={item.id}
+                device={item}
+                settings={this.props.settings}
+              />
+            )}
             keyExtractor={(item, index) => index.toString()}
           />
         </Content>
@@ -223,12 +235,12 @@ class HomeScreen extends Component {
 
 const styles = StyleSheet.create({});
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const {devices, settings} = state;
   return {devices, settings};
 };
 
-const mapDispatchToProps = dispatch =>
+const mapDispatchToProps = (dispatch) =>
   bindActionCreators(
     {
       addDevice,
