@@ -9,18 +9,6 @@ export default class Card extends Component {
       <Content padder>
         <Grid style={styles.card}>
           <Col size={2} style={styles.mainSection}>
-            {this.props.isAlarm ? (
-              <Icon
-                type="MaterialCommunityIcons"
-                name="bell-ring"
-                style={{
-                  color: 'dimgray',
-                  fontSize: 40,
-                  position: 'absolute',
-                  top: 10,
-                  left: 10,
-                }}></Icon>
-            ) : null}
             <Row>
               <Body>
                 <Thumbnail
@@ -180,81 +168,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-/*
-  // Action
-  <Icon
-    type="MaterialIcons"
-    name="airline-seat-flat-angled"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>
-  
-  // Temp
-  <Icon
-    type="FontAwesome5"
-    name="thermometer-half"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>
-  
-  // Pressure
-  <Icon
-    type="MaterialCommunityIcons"
-    name="gauge"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>
-
-  <Icon
-    type="Entypo"
-    name="gauge"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>
-  
-  // Air
-  <Icon
-    type="Entypo"
-    name="air"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>
-
-  // Hum
-  <Icon
-    type="Entypo"
-    name="water"
-    style={{
-      color: 'dimgray',
-      fontSize: 90,
-    }}></Icon>              
-*/
-
-/* 
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>
-      {this.props.device.value.state}°
-    </Text>
-  </Body>
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.temp}°</Text>
-  </Body>
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.pres}°</Text>
-  </Body>
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.hum}°</Text>
-  </Body>
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.gas}°</Text>
-  </Body>
-  <Body>
-    <Text style={{fontSize: 90, color: 'dimgray'}}>{this.props.device.value.alt}°</Text>
-  </Body>
-*/
