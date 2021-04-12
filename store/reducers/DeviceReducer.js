@@ -7,7 +7,7 @@ import {
 const INITIAL_STATE = {
   activeDevices: [
     /*{
-      name: 'Mr. Muller',
+      id: 'Clip-050990',
       value: {
         state: 'up',
         temp: 23,
@@ -15,6 +15,7 @@ const INITIAL_STATE = {
         hum: 50,
         gas: 60,
         alt: 90,
+        mois: 20
       },
       updatedTime: Date.now() - 1,
     },*/
@@ -28,13 +29,13 @@ const deviceReducer = (state = INITIAL_STATE, action) => {
       return {...state};
     case REMOVE_DEVICE:
       const removedDeviceIndex = state.activeDevices.findIndex(
-        device => action.payload.name === device.name,
+        device => action.payload.id === device.id,
       );
       state.activeDevices.splice(removedDeviceIndex, 1);
       return {...state};
     case UPDATE_DEVICE:
       const updatedDeviceIndex = state.activeDevices.findIndex(
-        device => action.payload.name === device.name,
+        device => action.payload.id === device.id,
       );
       state.activeDevices[updatedDeviceIndex] = action.payload;
       return {...state};

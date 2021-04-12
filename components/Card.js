@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, Image, View} from 'react-native';
 import {Content, Text, Icon, Thumbnail, Body} from 'native-base';
 import {Col, Row, Grid} from 'react-native-easy-grid';
 
@@ -14,23 +14,29 @@ export default class Card extends Component {
                 <Thumbnail
                   style={styles.avatar}
                   large
-                  source={{
-                    uri: 'https://picsum.photos/id/1027/600/600',
-                  }}
+                  source={require(`../design/avatars/07.jpg`)}
                 />
               </Body>
             </Row>
             <Row>
               <Body>
-                <Text style={styles.userName}>{this.props.device.name}</Text>
+                <Text style={styles.userName}>
+                  {this.props.deviceNames.find(
+                    (info) => info.id === this.props.device.id,
+                  )
+                    ? this.props.deviceNames.find(
+                        (info) => info.id === this.props.device.id,
+                      ).name
+                    : this.props.device.id}
+                </Text>
               </Body>
             </Row>
           </Col>
           <Col size={3} style={styles.infoSection}>
             <Row>
+              {/* Temp */}
               <Col style={styles.center}>
                 <Row>
-                  {/* Temp */}
                   <Icon
                     type="FontAwesome5"
                     name="thermometer-half"
@@ -40,39 +46,48 @@ export default class Card extends Component {
                         Number(this.props.settings.temp_threshold)
                           ? 'red'
                           : 'dimgray',
-                      fontSize: 90,
-                      height: 100,
+                      fontSize: 80,
+                      height: 90,
                     }}></Icon>
                 </Row>
                 <Row>
                   <Body>
-                    <Text>(Temp) {this.props.device.temp} °C</Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Temp) {this.props.device.temp} °C
+                    </Text>
                   </Body>
                 </Row>
               </Col>
+              {/* Triple-Axis */}
               <Col style={styles.center}>
                 <Row>
-                  {/* Position */}
                   <Icon
                     type="MaterialIcons"
                     name="airline-seat-flat-angled"
                     style={{
                       color: 'dimgray',
-                      fontSize: 90,
-                      height: 100,
+                      fontSize: 80,
+                      height: 90,
                     }}></Icon>
                 </Row>
                 <Row>
                   <Body>
-                    <Text>(Position) Sleep</Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Axis) {this.props.device.ax}-{this.props.device.ay}-
+                      {this.props.device.az}
+                    </Text>
                   </Body>
                 </Row>
               </Col>
-            </Row>
-            <Row>
+              {/* Gas */}
               <Col style={styles.center}>
                 <Row>
-                  {/* Gas */}
                   <Icon
                     type="Entypo"
                     name="air"
@@ -82,19 +97,26 @@ export default class Card extends Component {
                         Number(this.props.settings.gas_threshold)
                           ? 'red'
                           : 'dimgray',
-                      fontSize: 90,
-                      height: 100,
+                      fontSize: 80,
+                      height: 90,
                     }}></Icon>
                 </Row>
                 <Row>
                   <Body>
-                    <Text>(Gas) {this.props.device.gas} Ohms</Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Gas) {this.props.device.gas} Ohms
+                    </Text>
                   </Body>
                 </Row>
               </Col>
+            </Row>
+            <Row>
+              {/* Hum */}
               <Col style={styles.center}>
                 <Row>
-                  {/* Hum */}
                   <Icon
                     type="Entypo"
                     name="water"
@@ -104,13 +126,69 @@ export default class Card extends Component {
                         Number(this.props.settings.hum_threshold)
                           ? 'red'
                           : 'dimgray',
-                      fontSize: 90,
-                      height: 100,
+                      fontSize: 80,
+                      height: 90,
                     }}></Icon>
                 </Row>
                 <Row>
                   <Body>
-                    <Text>(Humidity) {this.props.device.hum} %</Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Hum) {this.props.device.hum} %
+                    </Text>
+                  </Body>
+                </Row>
+              </Col>
+              {/* Press */}
+              <Col style={styles.center}>
+                <Row>
+                  <Icon
+                    type="Entypo"
+                    name="gauge"
+                    style={{
+                      color:
+                        this.props.device.hum >
+                        Number(this.props.settings.hum_threshold)
+                          ? 'red'
+                          : 'dimgray',
+                      fontSize: 80,
+                      height: 90,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Press) {this.props.device.hum} hPa
+                    </Text>
+                  </Body>
+                </Row>
+              </Col>
+              {/* Mois */}
+              <Col style={styles.center}>
+                <Row>
+                  <Image
+                    source={
+                      this.props.device.mois >
+                      Number(this.props.settings.mois_threshold)
+                        ? require('../design/icons/diaper-red.png')
+                        : require('../design/icons/diaper.png')
+                    }
+                    style={styles.icon}
+                  />
+                </Row>
+                <Row>
+                  <Body>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                      }}>
+                      (Wet) {this.props.device.mois} %
+                    </Text>
                   </Body>
                 </Row>
               </Col>
@@ -150,6 +228,10 @@ const styles = StyleSheet.create({
     height: 150,
     width: 150,
     borderRadius: 180,
+  },
+  icon: {
+    height: 80,
+    width: 80,
   },
   userName: {
     fontSize: 25,

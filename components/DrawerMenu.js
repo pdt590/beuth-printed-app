@@ -3,8 +3,8 @@ import {StyleSheet, Text, TouchableOpacity, View, FlatList} from 'react-native';
 import { Icon } from 'native-base';
 
 const menuData = [
-  {icon: 'md-home', name: 'Home', screenName: 'HomeScreen', key: 1},
-  {icon: 'md-settings', name: 'Setting', screenName: 'SettingScreen', key: 2}
+  {icon: 'home', name: 'Home', screenName: 'HomeScreen', key: 1},
+  {icon: 'cog', name: 'Setting', screenName: 'SettingScreen', key: 2}
 ];
 
 const DrawerMenu = props => {
@@ -33,7 +33,7 @@ const DrawerItem = ({navigation, icon, name, screenName}) => (
     onPress={() =>
       navigation.navigate(`${screenName}`, {isStatusBarHidden: false})
     }>
-    <Icon name={icon} size={30} color="#333" style={{margin: 15}} />
+    <Icon type="FontAwesome" name={icon} size={30} color="#333" style={{margin: 15}} />
     <Text style={styles.menuItemText}>{name}</Text>
   </TouchableOpacity>
 );
