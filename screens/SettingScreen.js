@@ -60,7 +60,7 @@ class SettingScreen extends Component {
                 value={this.state.mqtt_server}
               />
             </Item>
-            <Item stackedLabel style={styles.input}>
+            {/* <Item stackedLabel style={styles.input}>
               <Label>Subscribe Topic</Label>
               <Input
                 onChangeText={(newTopic) =>
@@ -68,7 +68,7 @@ class SettingScreen extends Component {
                 }
                 value={this.state.mqtt_subtopic}
               />
-            </Item>
+            </Item> */}
 
             <ListItem style={styles.input}>
               <Body>

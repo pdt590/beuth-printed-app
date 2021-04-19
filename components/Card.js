@@ -78,9 +78,10 @@ export default class Card extends Component {
                     <Text
                       style={{
                         fontSize: 12,
+                        textAlign: 'center'
                       }}>
-                      (Axis) {this.props.device.ax}-{this.props.device.ay}-
-                      {this.props.device.az}
+                      (Axis) {"\n"} {this.props.device.ax.toFixed(3)}\{this.props.device.ay.toFixed(3)}\
+                      {this.props.device.az.toFixed(3)}
                     </Text>
                   </Body>
                 </Row>
@@ -143,7 +144,7 @@ export default class Card extends Component {
               </Col>
               {/* Press */}
               <Col style={styles.center}>
-                <Row>
+                {/* <Row>
                   <Icon
                     type="Entypo"
                     name="gauge"
@@ -166,7 +167,7 @@ export default class Card extends Component {
                       (Press) {this.props.device.hum} hPa
                     </Text>
                   </Body>
-                </Row>
+                </Row> */}
               </Col>
               {/* Mois */}
               <Col style={styles.center}>

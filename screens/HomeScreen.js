@@ -24,6 +24,8 @@ import {
   Text,
 } from 'native-base';
 import Card from '../components/Card';
+import {BleManager} from 'react-native-ble-plx';
+import {Buffer} from 'buffer';
 import Mqtt from 'sp-react-native-mqtt';
 import NetInfo from '@react-native-community/netinfo';
 import {connect} from 'react-redux';
@@ -44,6 +46,12 @@ class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.targetServiceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+    this.targetCharacteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+    // Creating BLE Manager
+    this.manager = new BleManager();
+
     this.connectionStatus = false;
     this.client = null;
     this.timerId = null;
@@ -54,6 +62,17 @@ class HomeScreen extends Component {
     };
   }
 
+  // Setting info messages
+  info(message) {
+    this.setState({log: '[INFO] ' + message});
+    console.log(this.state.log);
+  }
+
+  error(message) {
+    this.setState({log: '[ERROR] ' + message});
+    console.log(this.state.log);
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.settings !== prevProps.settings) {
       this.disconnect();
@@ -62,7 +81,6 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    //this.init();
     this.netinfoUnsubscribe = NetInfo.addEventListener((state) => {
       // TODO
       // There is Call twice issue
@@ -70,8 +88,15 @@ class HomeScreen extends Component {
       if (state.isConnected) {
         console.log('You are online!');
         if (this.connectionStatus !== state.isConnected) {
-          this.init();
-          this.connectionStatus = state.isConnected;
+          // Waiting for Powered On state in iOS
+          if (Platform.OS === 'ios') {
+            this.manager.onStateChange((state) => {
+              if (state === 'PoweredOn') this.init();
+            });
+          } else {
+            this.init();
+            this.connectionStatus = state.isConnected;
+          }
         }
       } else {
         console.log('You are offline!');
@@ -133,17 +158,16 @@ class HomeScreen extends Component {
       type: 'success',
       duration: 5000,
     });
-    this.client.subscribe(this.props.settings.mqtt_subtopic, 0);
+    this.scanAndConnect(this.client);
     clearInterval(this.timerId);
     this.timerId = setInterval(
-      this.onDevicesListener.bind(this),
+      this.onRefreshDeviceList.bind(this),
       Number(this.props.settings.device_list_refresh_interval) * 1000,
     );
   }
 
   onConnectionClosed(err) {
     console.log(`MQTT onConnectionClosed: ${err}`);
-    clearInterval(this.timerId);
     Toast.show({
       text: 'Connection Closed',
       position: 'top',
@@ -154,10 +178,7 @@ class HomeScreen extends Component {
     });
   }
 
-  onMessageArrived(message) {
-    const device = JSON.parse(message.data);
-    this.onMessageProcess(device);
-  }
+  onMessageArrived(message) {}
 
   init() {
     this.onConnectionOpened = this.onConnectionOpened.bind(this);
@@ -189,8 +210,8 @@ class HomeScreen extends Component {
       });
   }
 
-  // Updating device
-  onMessageProcess(device) {
+  // BLE
+  onUpdateDevice(device) {
     if (
       !this.props.devices.activeDevices.find(
         (activeDevice) => device.id === activeDevice.id,
@@ -215,7 +236,7 @@ class HomeScreen extends Component {
   }
 
   // Checking devices
-  onDevicesListener() {
+  onRefreshDeviceList() {
     const activeDevices = this.props.devices.activeDevices;
     if (!activeDevices.length) return;
     for (const device of activeDevices) {
@@ -227,6 +248,61 @@ class HomeScreen extends Component {
         this.props.removeDevice(device);
       }
     }
+  }
+
+  // Scanning devices
+  scanAndConnect(mqttClient) {
+    this.manager.startDeviceScan(null, null, (error, server) => {
+      //this.info('Scanning...');
+      if (error) {
+        this.error('Error 01 - ' + error.message);
+        return;
+      }
+      let deviceName = server.name;
+      if (deviceName !== null && deviceName.includes('Clip')) {
+        //this.manager.stopDeviceScan()
+        server
+          .connect({requestMTU: 256})
+          .then((server) => {
+            this.info('Discovering services and characteristics');
+            return server.discoverAllServicesAndCharacteristics();
+          })
+          .then(
+            (server) => {
+              this.info('Setting notifications');
+              this.subscriptionMonitor = server.monitorCharacteristicForService(
+                this.targetServiceUUID,
+                this.targetCharacteristicUUID,
+                (error, characteristic) => {
+                  if (error) {
+                    this.error('Error 02 - ' + error.message);
+                    if (this.subscriptionMonitor) {
+                      this.subscriptionMonitor.remove();
+                    }
+                    return;
+                  }
+                  const buffer = new Buffer(characteristic.value, 'base64');
+                  let stringData = buffer.toString();
+                  let jsonData = JSON.parse(stringData);
+                  mqttClient.publish(
+                    `sensors/${jsonData.id}`,
+                    stringData,
+                    0,
+                    false,
+                  );
+                  let device = {
+                    ...jsonData,
+                  };
+                  this.onUpdateDevice(device);
+                },
+              );
+            },
+            (error) => {
+              this.error('Error 03 - ' + error.message);
+            },
+          );
+      }
+    });
   }
 
   renderModalContent() {
