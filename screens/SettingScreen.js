@@ -101,7 +101,7 @@ class SettingScreen extends Component {
               />
             </Item>
 
-            {/*             <Separator bordered>
+            {/* <Separator bordered>
               <Text style={{fontSize: 15}}>BLE SETTING</Text>
             </Separator>
             <Item stackedLabel style={styles.input}>
@@ -155,7 +155,7 @@ class SettingScreen extends Component {
                 defaultValue={this.state.temp_threshold}
               />
             </Item>
-            {/*             <Item stackedLabel style={styles.input}>
+            {/* <Item stackedLabel style={styles.input}>
               <Label>Pressure Threshold</Label>
               <Input
                 onChangeText={(newThreshold) =>
@@ -164,7 +164,7 @@ class SettingScreen extends Component {
                 defaultValue={this.state.pressure_threshold}
               />
             </Item> */}
-            <Item stackedLabel style={styles.input}>
+            {/* <Item stackedLabel style={styles.input}>
               <Label>Gas Threshold (Ohms)</Label>
               <Input
                 onChangeText={(newThreshold) =>
@@ -172,7 +172,7 @@ class SettingScreen extends Component {
                 }
                 defaultValue={this.state.gas_threshold}
               />
-            </Item>
+            </Item> */}
             <Item stackedLabel style={styles.input}>
               <Label>Humidity Threshold (%)</Label>
               <Input
@@ -183,12 +183,39 @@ class SettingScreen extends Component {
               />
             </Item>
             <Item stackedLabel style={styles.input}>
-              <Label>Mois Threshold (&lt;100%)</Label>
+              <Label>Wet Threshold (&lt;100%)</Label>
               <Input
                 onChangeText={(newThreshold) =>
-                  this.setState({mois_threshold: newThreshold})
+                  this.setState({wet_threshold: newThreshold})
                 }
-                value={this.state.mois_threshold}
+                value={this.state.wet_threshold}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Ax Threshold (&lt;10)</Label>
+              <Input
+                onChangeText={(newThreshold) =>
+                  this.setState({ax_threshold: newThreshold})
+                }
+                value={this.state.ax_threshold}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Ay Threshold (&lt;10)</Label>
+              <Input
+                onChangeText={(newThreshold) =>
+                  this.setState({ay_threshold: newThreshold})
+                }
+                value={this.state.ay_threshold}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Az Threshold (&lt;10)</Label>
+              <Input
+                onChangeText={(newThreshold) =>
+                  this.setState({az_threshold: newThreshold})
+                }
+                value={this.state.az_threshold}
               />
             </Item>
           </Form>

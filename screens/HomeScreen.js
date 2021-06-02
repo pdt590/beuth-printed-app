@@ -48,6 +48,7 @@ class HomeScreen extends Component {
 
     this.targetServiceUUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
     this.targetCharacteristicUUID = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+    this.subscriptionMonitor = null;
 
     // Creating BLE Manager
     this.manager = new BleManager();
@@ -132,7 +133,7 @@ class HomeScreen extends Component {
     if (this.client) {
       console.log('Killing connection.');
       clearInterval(this.timerId);
-      this.client.disconnect();
+      this.client.disconnect(); // this.client = null
     }
   }
 
@@ -158,12 +159,6 @@ class HomeScreen extends Component {
       type: 'success',
       duration: 5000,
     });
-    this.scanAndConnect(this.client);
-    clearInterval(this.timerId);
-    this.timerId = setInterval(
-      this.onRefreshDeviceList.bind(this),
-      Number(this.props.settings.device_list_refresh_interval) * 1000,
-    );
   }
 
   onConnectionClosed(err) {
@@ -198,12 +193,18 @@ class HomeScreen extends Component {
     };
     Mqtt.createClient(conProps)
       .then((client) => {
-        this.client = client;
         client.on('closed', this.onConnectionClosed);
         client.on('error', this.onError);
         client.on('message', this.onMessageArrived);
         client.on('connect', this.onConnectionOpened);
         client.connect();
+        
+        this.client = client;
+        this.scanAndConnect(client);
+        this.timerId = setInterval(
+          this.onRefreshDeviceList.bind(this),
+          Number(this.props.settings.device_list_refresh_interval) * 1000,
+        );
       })
       .catch((err) => {
         console.error(`MQTT createtClient error: ${err}`);
@@ -284,12 +285,14 @@ class HomeScreen extends Component {
                   const buffer = new Buffer(characteristic.value, 'base64');
                   let stringData = buffer.toString();
                   let jsonData = JSON.parse(stringData);
-                  mqttClient.publish(
-                    `sensors/${jsonData.id}`,
-                    stringData,
-                    0,
-                    false,
-                  );
+                  if (mqttClient) {
+                    mqttClient.publish(
+                      `sensors/${jsonData.id}`,
+                      stringData,
+                      0,
+                      false,
+                    );
+                  }
                   let device = {
                     ...jsonData,
                   };

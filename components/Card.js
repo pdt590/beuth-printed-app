@@ -14,7 +14,7 @@ export default class Card extends Component {
                 <Thumbnail
                   style={styles.avatar}
                   large
-                  source={require(`../design/avatars/07.jpg`)}
+                  source={require(`../design/avatars/no_profile.png`)}
                 />
               </Body>
             </Row>
@@ -61,34 +61,9 @@ export default class Card extends Component {
                   </Body>
                 </Row>
               </Col>
-              {/* Triple-Axis */}
-              <Col style={styles.center}>
-                <Row>
-                  <Icon
-                    type="MaterialIcons"
-                    name="airline-seat-flat-angled"
-                    style={{
-                      color: 'dimgray',
-                      fontSize: 80,
-                      height: 90,
-                    }}></Icon>
-                </Row>
-                <Row>
-                  <Body>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        textAlign: 'center'
-                      }}>
-                      (Axis) {"\n"} {this.props.device.ax.toFixed(3)}\{this.props.device.ay.toFixed(3)}\
-                      {this.props.device.az.toFixed(3)}
-                    </Text>
-                  </Body>
-                </Row>
-              </Col>
               {/* Gas */}
-              <Col style={styles.center}>
-                <Row>
+              {/*<Col style={styles.center}>
+                  <Row>
                   <Icon
                     type="Entypo"
                     name="air"
@@ -109,6 +84,32 @@ export default class Card extends Component {
                         fontSize: 12,
                       }}>
                       (Gas) {this.props.device.gas} Ohms
+                    </Text>
+                  </Body>
+                </Row>
+              </Col>*/}
+              {/* Triple-Axis */}
+              <Col style={styles.center}>
+                <Row>
+                  <Icon
+                    type="MaterialIcons"
+                    name="airline-seat-flat-angled"
+                    style={{
+                      color: 'dimgray',
+                      fontSize: 80,
+                      height: 90,
+                    }}></Icon>
+                </Row>
+                <Row>
+                  <Body>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        textAlign: 'center',
+                      }}>
+                      (Axis) {'\n'} {this.props.device.ax.toFixed(3)}\
+                      {this.props.device.ay.toFixed(3)}\
+                      {this.props.device.az.toFixed(3)}
                     </Text>
                   </Body>
                 </Row>
@@ -143,8 +144,8 @@ export default class Card extends Component {
                 </Row>
               </Col>
               {/* Press */}
-              <Col style={styles.center}>
-                {/* <Row>
+              {/*<Col style={styles.center}>
+                 <Row>
                   <Icon
                     type="Entypo"
                     name="gauge"
@@ -167,15 +168,15 @@ export default class Card extends Component {
                       (Press) {this.props.device.hum} hPa
                     </Text>
                   </Body>
-                </Row> */}
-              </Col>
+                </Row> 
+              </Col>*/}
               {/* Mois */}
               <Col style={styles.center}>
                 <Row>
                   <Image
                     source={
-                      this.props.device.mois >
-                      Number(this.props.settings.mois_threshold)
+                      this.props.device.wet >
+                      Number(this.props.settings.wet_threshold)
                         ? require('../design/icons/diaper-red.png')
                         : require('../design/icons/diaper.png')
                     }
@@ -188,7 +189,7 @@ export default class Card extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      (Wet) {this.props.device.mois} %
+                      (Wet) {this.props.device.wet} %
                     </Text>
                   </Body>
                 </Row>
