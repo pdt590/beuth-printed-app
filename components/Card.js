@@ -41,11 +41,7 @@ export default class Card extends Component {
                     type="FontAwesome5"
                     name="thermometer-half"
                     style={{
-                      color:
-                        this.props.device.temp >
-                        Number(this.props.settings.temp_threshold)
-                          ? 'red'
-                          : 'dimgray',
+                      color: this.props.device.isTempHigh ? 'red' : 'dimgray',
                       fontSize: 80,
                       height: 90,
                     }}></Icon>
@@ -56,23 +52,19 @@ export default class Card extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      (Temp) {this.props.device.temp} °C
+                      (Temp) {this.props.device.temp.toFixed(2)} °C
                     </Text>
                   </Body>
                 </Row>
               </Col>
               {/* Gas */}
-              {/*<Col style={styles.center}>
-                  <Row>
+              <Col style={styles.center}>
+                <Row>
                   <Icon
                     type="Entypo"
                     name="air"
                     style={{
-                      color:
-                        this.props.device.gas >
-                        Number(this.props.settings.gas_threshold)
-                          ? 'red'
-                          : 'dimgray',
+                      color: this.props.device.isGasHigh ? 'red' : 'dimgray',
                       fontSize: 80,
                       height: 90,
                     }}></Icon>
@@ -83,11 +75,13 @@ export default class Card extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      (Gas) {this.props.device.gas} Ohms
+                      (Gas) {this.props.device.gas.toFixed(2)} Ohms
                     </Text>
                   </Body>
                 </Row>
-              </Col>*/}
+              </Col>
+            </Row>
+            <Row>
               {/* Triple-Axis */}
               <Col style={styles.center}>
                 <Row>
@@ -95,7 +89,9 @@ export default class Card extends Component {
                     type="MaterialIcons"
                     name="airline-seat-flat-angled"
                     style={{
-                      color: 'dimgray',
+                      color: this.props.device.isHumHealthBad
+                        ? 'red'
+                        : 'dimgray',
                       fontSize: 80,
                       height: 90,
                     }}></Icon>
@@ -107,76 +103,19 @@ export default class Card extends Component {
                         fontSize: 12,
                         textAlign: 'center',
                       }}>
-                      (Axis) {'\n'} {this.props.device.ax.toFixed(3)}\
-                      {this.props.device.ay.toFixed(3)}\
-                      {this.props.device.az.toFixed(3)}
+                      (Axis) {'\n'} {this.props.device.ax.toFixed(2)}\
+                      {this.props.device.ay.toFixed(2)}\
+                      {this.props.device.az.toFixed(2)}
                     </Text>
                   </Body>
                 </Row>
               </Col>
-            </Row>
-            <Row>
-              {/* Hum */}
-              <Col style={styles.center}>
-                <Row>
-                  <Icon
-                    type="Entypo"
-                    name="water"
-                    style={{
-                      color:
-                        this.props.device.hum >
-                        Number(this.props.settings.hum_threshold)
-                          ? 'red'
-                          : 'dimgray',
-                      fontSize: 80,
-                      height: 90,
-                    }}></Icon>
-                </Row>
-                <Row>
-                  <Body>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                      }}>
-                      (Hum) {this.props.device.hum} %
-                    </Text>
-                  </Body>
-                </Row>
-              </Col>
-              {/* Press */}
-              {/*<Col style={styles.center}>
-                 <Row>
-                  <Icon
-                    type="Entypo"
-                    name="gauge"
-                    style={{
-                      color:
-                        this.props.device.hum >
-                        Number(this.props.settings.hum_threshold)
-                          ? 'red'
-                          : 'dimgray',
-                      fontSize: 80,
-                      height: 90,
-                    }}></Icon>
-                </Row>
-                <Row>
-                  <Body>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                      }}>
-                      (Press) {this.props.device.hum} hPa
-                    </Text>
-                  </Body>
-                </Row> 
-              </Col>*/}
-              {/* Mois */}
+              {/* Wet */}
               <Col style={styles.center}>
                 <Row>
                   <Image
                     source={
-                      this.props.device.wet >
-                      Number(this.props.settings.wet_threshold)
+                      this.props.device.isWetHigh
                         ? require('../design/icons/diaper-red.png')
                         : require('../design/icons/diaper.png')
                     }
@@ -189,7 +128,7 @@ export default class Card extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      (Wet) {this.props.device.wet} %
+                      (Wet) {this.props.device.newWetAfterCalibration}
                     </Text>
                   </Body>
                 </Row>

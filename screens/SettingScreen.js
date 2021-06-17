@@ -146,8 +146,9 @@ class SettingScreen extends Component {
             <Separator bordered>
               <Text style={{fontSize: 15}}>DATA SETTING</Text>
             </Separator>
+
             <Item stackedLabel style={styles.input}>
-              <Label>Temperature Threshold (*C)</Label>
+              <Label>Temperature Threshold (°C)</Label>
               <Input
                 onChangeText={(newThreshold) =>
                   this.setState({temp_threshold: newThreshold})
@@ -155,16 +156,9 @@ class SettingScreen extends Component {
                 defaultValue={this.state.temp_threshold}
               />
             </Item>
-            {/* <Item stackedLabel style={styles.input}>
-              <Label>Pressure Threshold</Label>
-              <Input
-                onChangeText={(newThreshold) =>
-                  this.setState({pressure_threshold: newThreshold})
-                }
-                defaultValue={this.state.pressure_threshold}
-              />
-            </Item> */}
-            {/* <Item stackedLabel style={styles.input}>
+
+            <Separator></Separator>
+            <Item stackedLabel style={styles.input}>
               <Label>Gas Threshold (Ohms)</Label>
               <Input
                 onChangeText={(newThreshold) =>
@@ -172,18 +166,20 @@ class SettingScreen extends Component {
                 }
                 defaultValue={this.state.gas_threshold}
               />
-            </Item> */}
-            <Item stackedLabel style={styles.input}>
-              <Label>Humidity Threshold (%)</Label>
-              <Input
-                onChangeText={(newThreshold) =>
-                  this.setState({hum_threshold: newThreshold})
-                }
-                value={this.state.hum_threshold}
-              />
             </Item>
             <Item stackedLabel style={styles.input}>
-              <Label>Wet Threshold (&lt;100%)</Label>
+              <Label>Gas Calibration (Ohms) - value in normal condition</Label>
+              <Input
+                onChangeText={(newCalibration) =>
+                  this.setState({gas_calibration: newCalibration})
+                }
+                value={this.state.gas_calibration}
+              />
+            </Item>
+
+            <Separator></Separator>
+            <Item stackedLabel style={styles.input}>
+              <Label>Wet Threshold</Label>
               <Input
                 onChangeText={(newThreshold) =>
                   this.setState({wet_threshold: newThreshold})
@@ -191,6 +187,17 @@ class SettingScreen extends Component {
                 value={this.state.wet_threshold}
               />
             </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Wet Calibration - value in dry condition</Label>
+              <Input
+                onChangeText={(newCalibration) =>
+                  this.setState({wet_calibration: newCalibration})
+                }
+                value={this.state.wet_calibration}
+              />
+            </Item>
+
+            <Separator></Separator>
             <Item stackedLabel style={styles.input}>
               <Label>Ax Threshold (&lt;10)</Label>
               <Input
@@ -216,6 +223,15 @@ class SettingScreen extends Component {
                   this.setState({az_threshold: newThreshold})
                 }
                 value={this.state.az_threshold}
+              />
+            </Item>
+            <Item stackedLabel style={styles.input}>
+              <Label>Human Check Interval (s)</Label>
+              <Input
+                onChangeText={(newThreshold) =>
+                  this.setState({human_check_interval: newThreshold})
+                }
+                value={this.state.human_check_interval}
               />
             </Item>
           </Form>

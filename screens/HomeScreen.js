@@ -140,7 +140,7 @@ class HomeScreen extends Component {
   onError(error) {
     console.log(`MQTT onError: ${error}`);
     Toast.show({
-      text: 'Error! Check Internet Connection',
+      text: 'Check Internet Connection',
       position: 'top',
       textStyle: {fontSize: 20, textAlign: 'center'},
       style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
@@ -198,7 +198,7 @@ class HomeScreen extends Component {
         client.on('message', this.onMessageArrived);
         client.on('connect', this.onConnectionOpened);
         client.connect();
-        
+
         this.client = client;
         this.scanAndConnect(client);
         this.timerId = setInterval(
@@ -271,6 +271,31 @@ class HomeScreen extends Component {
           .then(
             (server) => {
               this.info('Setting notifications');
+
+              let isTempHigh = false;
+              let isGasHigh = false;
+              let newGasAfterCalibration = 0;
+              let isWetHigh = false;
+              let newWetAfterCalibration = 0;
+
+              let isHumHealthBad = false;
+
+              // Accelerometer data process
+              //
+              //
+              let axArray = [];
+              let ayArray = [];
+              let azArray = [];
+              let minAx = 0;
+              let minAy = 0;
+              let minAz = 0;
+              let axMove = true;
+              let ayMove = true;
+              let azMove = true;
+              //
+              //
+              // End accelerometer data process
+
               this.subscriptionMonitor = server.monitorCharacteristicForService(
                 this.targetServiceUUID,
                 this.targetCharacteristicUUID,
@@ -285,18 +310,136 @@ class HomeScreen extends Component {
                   const buffer = new Buffer(characteristic.value, 'base64');
                   let stringData = buffer.toString();
                   let jsonData = JSON.parse(stringData);
+
+                  // temp data process
+                  if (jsonData.temp < 0) {
+                    isTempHigh =
+                      jsonData.temp < this.props.settings.temp_threshold
+                        ? true
+                        : false;
+                  } else {
+                    isTempHigh =
+                      jsonData.temp > this.props.settings.temp_threshold
+                        ? true
+                        : false;
+                  }
+
+                  // gas calibration and data process
+                  // gas_calibration should be gas value in normal condition
+                  if (this.props.settings.gas_calibration != 0) {
+                    if (jsonData.gas > this.props.settings.gas_calibration) {
+                      newGasAfterCalibration = 0;
+                    } else {
+                      newGasAfterCalibration =
+                        this.props.settings.gas_calibration - jsonData.gas;
+                    }
+                    isGasHigh =
+                      newGasAfterCalibration > this.props.settings.gas_threshold
+                        ? true
+                        : false;
+                  } else {
+                    newGasAfterCalibration = jsonData.gas;
+                    isGasHigh = false;
+                  }
+
+                  // wet calibration and data process
+                  // wet_calibration should be dry adc value
+                  if (this.props.settings.wet_calibration != 0) {
+                    if (jsonData.wet > this.props.settings.wet_calibration) {
+                      newWetAfterCalibration = 0;
+                    } else {
+                      newWetAfterCalibration =
+                        this.props.settings.wet_calibration - jsonData.wet;
+                    }
+                    isWetHigh =
+                      newWetAfterCalibration > this.props.settings.wet_threshold
+                        ? true
+                        : false;
+                  } else {
+                    newWetAfterCalibration = jsonData.wet;
+                    isWetHigh = false;
+                  }
+
+                  // Accelerometer data process
+                  //
+                  //
+                  if (
+                    axArray.length >=
+                    this.props.settings.human_check_interval / 5
+                  ) {
+                    minAx = axArray.sort((a, b) => a - b)[0];
+                    axArray.forEach((e) => {
+                      if (e - minAx >= this.props.settings.ax_threshold) {
+                        axMove = true;
+                      } else {
+                        axMove = false;
+                      }
+                    });
+                    axArray = [];
+                  }
+                  axArray.push(Math.abs(jsonData.ax));
+
+                  if (
+                    ayArray.length >=
+                    this.props.settings.human_check_interval / 5
+                  ) {
+                    minAy = ayArray.sort((a, b) => a - b)[0];
+                    ayArray.forEach((e) => {
+                      if (e - minAy >= this.props.settings.ay_threshold) {
+                        ayMove = true;
+                      } else {
+                        ayMove = false;
+                      }
+                    });
+                    ayArray = [];
+                  }
+                  ayArray.push(Math.abs(jsonData.ay));
+
+                  if (
+                    azArray.length >=
+                    this.props.settings.human_check_interval / 5
+                  ) {
+                    minAz = azArray.sort((a, b) => a - b)[0];
+                    azArray.forEach((e) => {
+                      if (e - minAz >= this.props.settings.az_threshold) {
+                        azMove = true;
+                      } else {
+                        azMove = false;
+                      }
+                    });
+                    azArray = [];
+
+                    // check whether human moves or not after collecting enough data
+                    axMove || ayMove || azMove
+                      ? (isHumHealthBad = false)
+                      : (isHumHealthBad = true);
+                  }
+                  azArray.push(Math.abs(jsonData.az));
+                  //
+                  //
+                  // End accelerometer data process
+
+                  let device = {
+                    ...jsonData,
+                    newGasAfterCalibration: newGasAfterCalibration,
+                    newWetAfterCalibration: newWetAfterCalibration, // wet calibration
+                    isTempHigh: isTempHigh,
+                    isWetHigh: isWetHigh,
+                    isGasHigh: isGasHigh,
+                    isHumHealthBad: isHumHealthBad,
+                  };
+
+                  this.onUpdateDevice(device);
+
                   if (mqttClient) {
+                    // send data to cloud
                     mqttClient.publish(
-                      `sensors/${jsonData.id}`,
-                      stringData,
+                      `sensors/${device.id}`,
+                      JSON.stringify(device), // convert to string
                       0,
                       false,
                     );
                   }
-                  let device = {
-                    ...jsonData,
-                  };
-                  this.onUpdateDevice(device);
                 },
               );
             },
@@ -437,7 +580,6 @@ class HomeScreen extends Component {
                   key={item.id}
                   device={item}
                   deviceNames={this.props.deviceNames.infos}
-                  settings={this.props.settings}
                 />
               </TouchableOpacity>
             )}

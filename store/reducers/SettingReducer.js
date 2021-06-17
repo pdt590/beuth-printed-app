@@ -10,14 +10,22 @@ let INITIAL_STATE = {
   targetCharacteristicUUID: '',
   device_list_refresh_interval: '15',
   device_alive_time: '10',
+
   temp_threshold: '0',
-  pressure_threshold: '0',
+
   gas_threshold: '0',
-  hum_threshold: '0',
+  gas_calibration: '0',
+
   wet_threshold: '0',
-  ax_threshold: '0',
-  ay_threshold: '0',
-  az_threshold: '0',
+  wet_calibration: '0',
+
+  ax_threshold: '5',
+  ay_threshold: '5',
+  az_threshold: '5',
+  human_check_interval: '60',
+
+  //pressure_threshold: '0',
+  //hum_threshold: '0',
 };
 
 const settingReducer = (state = INITIAL_STATE, action) => {
