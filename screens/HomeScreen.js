@@ -363,13 +363,34 @@ class HomeScreen extends Component {
                   // Accelerometer data process
                   //
                   //
+                  if (minAx != 0 || minAy != 0 || minAz != 0) { // ignore init dataset process step
+                    if (
+                      Math.abs(jsonData.ax - minAx) >
+                      this.props.settings.ax_threshold
+                    ) {
+                      axMove = true;
+                    }
+                    if (
+                      Math.abs(jsonData.ay - minAy) >
+                      this.props.settings.ay_threshold
+                    ) {
+                      ayMove = true;
+                    }
+                    if (
+                      Math.abs(jsonData.az - minAz) >
+                      this.props.settings.az_threshold
+                    ) {
+                      azMove = true;
+                    }
+                  }
+
                   if (
                     axArray.length >=
                     this.props.settings.human_check_interval / 5
                   ) {
                     minAx = axArray.sort((a, b) => a - b)[0];
                     axArray.forEach((e) => {
-                      if (e - minAx >= this.props.settings.ax_threshold) {
+                      if (Math.abs(e - minAx) > this.props.settings.ax_threshold) {
                         axMove = true;
                       } else {
                         axMove = false;
@@ -377,7 +398,7 @@ class HomeScreen extends Component {
                     });
                     axArray = [];
                   }
-                  axArray.push(Math.abs(jsonData.ax));
+                  axArray.push(jsonData.ax);
 
                   if (
                     ayArray.length >=
@@ -385,7 +406,7 @@ class HomeScreen extends Component {
                   ) {
                     minAy = ayArray.sort((a, b) => a - b)[0];
                     ayArray.forEach((e) => {
-                      if (e - minAy >= this.props.settings.ay_threshold) {
+                      if (Math.abs(e - minAy) > this.props.settings.ay_threshold) {
                         ayMove = true;
                       } else {
                         ayMove = false;
@@ -393,7 +414,7 @@ class HomeScreen extends Component {
                     });
                     ayArray = [];
                   }
-                  ayArray.push(Math.abs(jsonData.ay));
+                  ayArray.push(jsonData.ay);
 
                   if (
                     azArray.length >=
@@ -401,20 +422,21 @@ class HomeScreen extends Component {
                   ) {
                     minAz = azArray.sort((a, b) => a - b)[0];
                     azArray.forEach((e) => {
-                      if (e - minAz >= this.props.settings.az_threshold) {
+                      if (Math.abs(e - minAz) > this.props.settings.az_threshold) {
                         azMove = true;
                       } else {
                         azMove = false;
                       }
                     });
                     azArray = [];
-
-                    // check whether human moves or not after collecting enough data
-                    axMove || ayMove || azMove
-                      ? (isHumHealthBad = false)
-                      : (isHumHealthBad = true);
                   }
-                  azArray.push(Math.abs(jsonData.az));
+                  azArray.push(jsonData.az);
+
+                  // check whether human moves or not after collecting enough data
+                  axMove || ayMove || azMove
+                    ? (isHumHealthBad = false)
+                    : (isHumHealthBad = true);
+
                   //
                   //
                   // End accelerometer data process
