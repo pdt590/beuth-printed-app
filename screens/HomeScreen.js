@@ -54,48 +54,9 @@ class HomeScreen extends Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.settings !== prevProps.settings) {
-      this.disconnect();
-      this.init();
-    }
-  }
-
-  componentDidMount() {
-    //this.init();
-    this.netinfoUnsubscribe = NetInfo.addEventListener((state) => {
-      // TODO
-      // There is Call twice issue
-      //if (state.type === 'wifi') {
-      if (state.isConnected) {
-        console.log('You are online!');
-        if (this.connectionStatus !== state.isConnected) {
-          this.init();
-          this.connectionStatus = state.isConnected;
-        }
-      } else {
-        console.log('You are offline!');
-        this.connectionStatus = false;
-        Toast.show({
-          text: 'Wifi Disconnected',
-          position: 'top',
-          textStyle: {fontSize: 20, textAlign: 'center'},
-          style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
-          type: 'danger',
-          duration: 5000,
-        });
-      }
-      //}
-    });
-  }
-
-  componentWillUnmount() {
-    if (this.netinfoUnsubscribe) {
-      this.netinfoUnsubscribe();
-      this.netinfoUnsubscribe = null;
-      this.connectionStatus = false;
-    }
-  }
+  /**
+   * FUNCTIONS
+   */
 
   randIdCreator() {
     const S4 = () =>
@@ -103,94 +64,8 @@ class HomeScreen extends Component {
     return `random${S4()}${S4()}${S4()}${S4()}${S4()}${S4()}`;
   }
 
-  disconnect() {
-    if (this.client) {
-      console.log('Killing connection.');
-      clearInterval(this.timerId);
-      this.client.disconnect();
-    }
-  }
-
-  onError(error) {
-    console.log(`MQTT onError: ${error}`);
-    Toast.show({
-      text: 'Error! Check Internet Connection',
-      position: 'top',
-      textStyle: {fontSize: 20, textAlign: 'center'},
-      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
-      type: 'danger',
-      duration: 5000,
-    });
-  }
-
-  onConnectionOpened() {
-    console.log('MQTT onConnectionOpened');
-    Toast.show({
-      text: 'Successfully',
-      position: 'top',
-      textStyle: {fontSize: 20, textAlign: 'center'},
-      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
-      type: 'success',
-      duration: 5000,
-    });
-    this.client.subscribe(this.props.settings.mqtt_subtopic, 0);
-    clearInterval(this.timerId);
-    this.timerId = setInterval(
-      this.onDevicesListener.bind(this),
-      Number(this.props.settings.device_list_refresh_interval) * 1000,
-    );
-  }
-
-  onConnectionClosed(err) {
-    console.log(`MQTT onConnectionClosed: ${err}`);
-    clearInterval(this.timerId);
-    Toast.show({
-      text: 'Connection Closed',
-      position: 'top',
-      textStyle: {fontSize: 20, textAlign: 'center'},
-      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
-      type: 'warning',
-      duration: 5000,
-    });
-  }
-
-  onMessageArrived(message) {
-    const device = JSON.parse(message.data);
-    this.onMessageProcess(device);
-  }
-
-  init() {
-    this.onConnectionOpened = this.onConnectionOpened.bind(this);
-    this.onConnectionClosed = this.onConnectionClosed.bind(this);
-    this.onError = this.onError.bind(this);
-    this.onMessageArrived = this.onMessageArrived.bind(this);
-    this.disconnect = this.disconnect.bind(this);
-
-    const deviceId = this.randIdCreator().replace(/[^a-zA-Z0-9]+/g, '');
-    const conProps = {
-      uri: `mqtt://${this.props.settings.mqtt_server}:1883`,
-      clientId: deviceId,
-      auth: this.props.settings.mqtt_auth,
-      user: this.props.settings.mqtt_user,
-      pass: this.props.settings.mqtt_pass,
-      clean: true, // clean session YES deletes the queue when all clients disconnect
-    };
-    Mqtt.createClient(conProps)
-      .then((client) => {
-        this.client = client;
-        client.on('closed', this.onConnectionClosed);
-        client.on('error', this.onError);
-        client.on('message', this.onMessageArrived);
-        client.on('connect', this.onConnectionOpened);
-        client.connect();
-      })
-      .catch((err) => {
-        console.error(`MQTT createtClient error: ${err}`);
-      });
-  }
-
   // Updating device
-  onMessageProcess(device) {
+  onUpdateDevice(device) {
     if (
       !this.props.devices.activeDevices.find(
         (activeDevice) => device.id === activeDevice.id,
@@ -215,7 +90,7 @@ class HomeScreen extends Component {
   }
 
   // Checking devices
-  onDevicesListener() {
+  onRefreshDeviceList() {
     const activeDevices = this.props.devices.activeDevices;
     if (!activeDevices.length) return;
     for (const device of activeDevices) {
@@ -298,6 +173,139 @@ class HomeScreen extends Component {
         </Form>
       </View>
     );
+  }
+
+  /**
+   * END FUNCTIONS
+   */
+
+  componentDidUpdate(prevProps) {
+    if (this.props.settings !== prevProps.settings) {
+      this.disconnect();
+      this.init();
+    }
+  }
+
+  componentDidMount() {
+    //this.init();
+    this.netinfoUnsubscribe = NetInfo.addEventListener((state) => {
+      // TODO
+      // There is Call twice issue
+      //if (state.type === 'wifi') {
+      if (state.isConnected) {
+        console.log('You are online!');
+        if (this.connectionStatus !== state.isConnected) {
+          this.init();
+          this.connectionStatus = state.isConnected;
+        }
+      } else {
+        console.log('You are offline!');
+        this.connectionStatus = false;
+        Toast.show({
+          text: 'Wifi Disconnected',
+          position: 'top',
+          textStyle: {fontSize: 20, textAlign: 'center'},
+          style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
+          type: 'danger',
+          duration: 5000,
+        });
+      }
+      //}
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.netinfoUnsubscribe) {
+      this.netinfoUnsubscribe();
+      this.netinfoUnsubscribe = null;
+      this.connectionStatus = false;
+    }
+  }
+
+  disconnect() {
+    if (this.client) {
+      console.log('Killing connection.');
+      clearInterval(this.timerId);
+      this.client.disconnect();
+    }
+  }
+
+  onError(error) {
+    console.log(`MQTT onError: ${error}`);
+    Toast.show({
+      text: 'Error! Check Internet Connection',
+      position: 'top',
+      textStyle: {fontSize: 20, textAlign: 'center'},
+      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
+      type: 'danger',
+      duration: 5000,
+    });
+  }
+
+  onConnectionOpened() {
+    console.log('MQTT onConnectionOpened');
+    Toast.show({
+      text: 'Successfully',
+      position: 'top',
+      textStyle: {fontSize: 20, textAlign: 'center'},
+      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
+      type: 'success',
+      duration: 5000,
+    });
+    this.client.subscribe(this.props.settings.mqtt_subtopic, 0);
+    clearInterval(this.timerId);
+    this.timerId = setInterval(
+      this.onRefreshDeviceList.bind(this),
+      Number(this.props.settings.device_list_refresh_interval) * 1000,
+    );
+  }
+
+  onConnectionClosed(err) {
+    console.log(`MQTT onConnectionClosed: ${err}`);
+    clearInterval(this.timerId);
+    Toast.show({
+      text: 'Connection Closed',
+      position: 'top',
+      textStyle: {fontSize: 20, textAlign: 'center'},
+      style: {top: '50%', marginLeft: 150, marginRight: 150, height: 100},
+      type: 'warning',
+      duration: 5000,
+    });
+  }
+
+  onMessageArrived(message) {
+    const device = JSON.parse(message.data);
+    this.onUpdateDevice(device);
+  }
+
+  init() {
+    this.onConnectionOpened = this.onConnectionOpened.bind(this);
+    this.onConnectionClosed = this.onConnectionClosed.bind(this);
+    this.onError = this.onError.bind(this);
+    this.onMessageArrived = this.onMessageArrived.bind(this);
+    this.disconnect = this.disconnect.bind(this);
+
+    const deviceId = this.randIdCreator().replace(/[^a-zA-Z0-9]+/g, '');
+    const conProps = {
+      uri: `mqtt://${this.props.settings.mqtt_server}:1883`,
+      clientId: deviceId,
+      auth: this.props.settings.mqtt_auth,
+      user: this.props.settings.mqtt_user,
+      pass: this.props.settings.mqtt_pass,
+      clean: true, // clean session YES deletes the queue when all clients disconnect
+    };
+    Mqtt.createClient(conProps)
+      .then((client) => {
+        this.client = client;
+        client.on('closed', this.onConnectionClosed);
+        client.on('error', this.onError);
+        client.on('message', this.onMessageArrived);
+        client.on('connect', this.onConnectionOpened);
+        client.connect();
+      })
+      .catch((err) => {
+        console.error(`MQTT createtClient error: ${err}`);
+      });
   }
 
   render() {

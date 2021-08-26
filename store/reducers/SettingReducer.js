@@ -5,16 +5,16 @@ let INITIAL_STATE = {
   mqtt_auth: true,
   mqtt_user: 'mqttuser',
   mqtt_pass: 'mqttpassword',
-  mqtt_subtopic: 'sensors/test',
+  mqtt_subtopic: 'sensors/#',
   targetServiceUUID: '',
   targetCharacteristicUUID: '',
   device_list_refresh_interval: '30',
   device_alive_time: '20',
-  temp_threshold: '0',
-  pressure_threshold: '0',
-  gas_threshold: '0',
-  hum_threshold: '0',
-  mois_threshold: '0',
+  temp_threshold: '10',
+  pressure_threshold: '10',
+  gas_threshold: '10',
+  hum_threshold: '10',
+  mois_threshold: '10',
 };
 
 const settingReducer = (state = INITIAL_STATE, action) => {
