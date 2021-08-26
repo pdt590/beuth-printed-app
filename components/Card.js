@@ -1,16 +1,146 @@
 import React, {Component} from 'react';
-import {StyleSheet, Image, View} from 'react-native';
-import {Content, Text, Icon, Thumbnail, Body} from 'native-base';
+import {StyleSheet, Image, View, Modal} from 'react-native';
+import {
+  Content,
+  Text,
+  Icon,
+  Thumbnail,
+  Body,
+  Input,
+  Form,
+  Item,
+  Label,
+  Button,
+} from 'native-base';
 import {Col, Row, Grid} from 'react-native-easy-grid';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {
+  addDeviceName,
+  removeDeviceName,
+  updateDeviceName,
+} from '../store/actions/DeviceNameActions';
 
-export default class Card extends Component {
+class Card extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      visibleModal: false,
+      selectedDeviceId: '',
+      selectedDeviceName: '',
+    };
+  }
+
+  renderModalContent() {
+    return (
+      <View style={{flex: 1}}>
+        <Form>
+          <Item stackedLabel>
+            <Label>Device ID</Label>
+            <Input disabled placeholder={this.state.selectedDeviceId} />
+          </Item>
+          <Item stackedLabel last>
+            <Label>Device Name</Label>
+            <Input
+              onChangeText={(newName) =>
+                this.setState({selectedDeviceName: newName})
+              }
+              value={this.state.selectedDeviceName}
+            />
+          </Item>
+          <Button
+            block
+            style={styles.modalButton}
+            onPress={() => {
+              if (
+                !this.props.deviceNames.infos.find(
+                  (info) => this.state.selectedDeviceId === info.id,
+                )
+              ) {
+                this.props.addDeviceName({
+                  id: this.state.selectedDeviceId,
+                  name: this.state.selectedDeviceName,
+                });
+              } else {
+                this.props.updateDeviceName({
+                  id: this.state.selectedDeviceId,
+                  name: this.state.selectedDeviceName,
+                });
+              }
+              this.setState({
+                visibleModal: false,
+              });
+            }}>
+            <Text>Save New Name</Text>
+          </Button>
+          <Button
+            block
+            style={styles.modalButton}
+            onPress={() => {
+              this.props.removeDeviceName({
+                id: this.state.selectedDeviceId,
+                name: this.state.selectedDeviceName,
+              });
+              this.setState({
+                visibleModal: false,
+              });
+            }}>
+            <Text>Remove Name</Text>
+          </Button>
+          <Button
+            block
+            style={styles.modalButton}
+            onPress={() =>
+              this.setState({
+                visibleModal: false,
+              })
+            }>
+            <Text>Close</Text>
+          </Button>
+        </Form>
+      </View>
+    );
+  }
+
   render() {
     return (
       <Content padder>
+        <Modal
+          transparent={false}
+          visible={this.state.visibleModal}
+          animationType="slide">
+          {this.renderModalContent()}
+        </Modal>
         <Grid style={styles.card}>
           <Col size={2} style={styles.mainSection}>
             <Row>
               <Body>
+                <Button
+                  small
+                  block
+                  transparent
+                  onPress={() => {
+                    let deviceName = this.props.deviceNames.infos.find(
+                      (info) => info.id === this.props.device.id,
+                    )
+                      ? this.props.deviceNames.infos.find(
+                          (info) => info.id === this.props.device.id,
+                        ).name
+                      : this.props.device.id;
+                    this.setState({
+                      visibleModal: true,
+                      selectedDeviceId: this.props.device.id,
+                      selectedDeviceName: deviceName,
+                    });
+                  }}>
+                  <Icon
+                    type="FontAwesome5"
+                    name="edit"
+                    style={{
+                      color: 'white',
+                    }}></Icon>
+                </Button>
                 <Thumbnail
                   style={styles.avatar}
                   large
@@ -21,10 +151,10 @@ export default class Card extends Component {
             <Row>
               <Body>
                 <Text style={styles.userName}>
-                  {this.props.deviceNames.find(
+                  {this.props.deviceNames.infos.find(
                     (info) => info.id === this.props.device.id,
                   )
-                    ? this.props.deviceNames.find(
+                    ? this.props.deviceNames.infos.find(
                         (info) => info.id === this.props.device.id,
                       ).name
                     : this.props.device.id}
@@ -75,7 +205,7 @@ export default class Card extends Component {
                       style={{
                         fontSize: 12,
                       }}>
-                      (Gas) {this.props.device.gas.toFixed(2)} Ohms
+                      (Gas) {this.props.device.newGasAfterCalibration.toFixed(2)} Ohms
                     </Text>
                   </Body>
                 </Row>
@@ -153,7 +283,6 @@ const styles = StyleSheet.create({
     elevation: 10,
     margin: 5,
     borderColor: '#FFF',
-    position: 'relative',
   },
   mainSection: {
     backgroundColor: '#54c740',
@@ -161,9 +290,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
     paddingTop: 60,
-  },
-  ringIcon: {
-    position: 'absolute',
   },
   avatar: {
     height: 150,
@@ -190,4 +316,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  modalButton: {
+    backgroundColor: '#54c740',
+    margin: 10,
+  },
 });
+
+const mapStateToProps = (state) => {
+  const {deviceNames} = state;
+  return {deviceNames};
+};
+
+const mapDispatchToProps = (dispatch) =>
+  bindActionCreators(
+    {
+      addDeviceName,
+      removeDeviceName,
+      updateDeviceName,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(Card);

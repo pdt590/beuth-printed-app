@@ -1,11 +1,5 @@
 import React, {Component} from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-  Modal,
-  View,
-} from 'react-native';
+import {FlatList} from 'react-native';
 import {
   Container,
   Header,
@@ -14,14 +8,9 @@ import {
   Left,
   Body,
   Right,
-  Title,
+  Title,                                        
   Content,
   Toast,
-  Input,
-  Form,
-  Item,
-  Label,
-  Text,
 } from 'native-base';
 import Card from '../components/Card';
 import {BleManager} from 'react-native-ble-plx';
@@ -54,7 +43,7 @@ class HomeScreen extends Component {
     this.manager = new BleManager();
 
     this.connectionStatus = false;
-    this.client = null;
+    this.mqttClient = null;
     this.timerId = null;
     this.state = {
       visibleModal: false,
@@ -130,10 +119,10 @@ class HomeScreen extends Component {
   }
 
   disconnect() {
-    if (this.client) {
+    if (this.mqttClient) {
       console.log('Killing connection.');
       clearInterval(this.timerId);
-      this.client.disconnect(); // this.client = null
+      this.mqttClient.disconnect(); // this.mqttClient = null
     }
   }
 
@@ -199,8 +188,8 @@ class HomeScreen extends Component {
         client.on('connect', this.onConnectionOpened);
         client.connect();
 
-        this.client = client;
-        this.scanAndConnect(client);
+        this.mqttClient = client;
+        this.scanAndConnect();
         this.timerId = setInterval(
           this.onRefreshDeviceList.bind(this),
           Number(this.props.settings.device_list_refresh_interval) * 1000,
@@ -272,13 +261,15 @@ class HomeScreen extends Component {
             (server) => {
               this.info('Setting notifications');
 
-              let isTempHigh = false;
-              let isGasHigh = false;
+              let isTempHigh = 0;
+
+              let isGasHigh = 0;
               let newGasAfterCalibration = 0;
-              let isWetHigh = false;
+
+              let isWetHigh = 0;
               let newWetAfterCalibration = 0;
 
-              let isHumHealthBad = false;
+              let isHumHealthBad = 0;
 
               // Accelerometer data process
               //
@@ -315,13 +306,13 @@ class HomeScreen extends Component {
                   if (jsonData.temp < 0) {
                     isTempHigh =
                       jsonData.temp < this.props.settings.temp_threshold
-                        ? true
-                        : false;
+                        ? 1
+                        : 0;
                   } else {
                     isTempHigh =
                       jsonData.temp > this.props.settings.temp_threshold
-                        ? true
-                        : false;
+                        ? 1
+                        : 0;
                   }
 
                   // gas calibration and data process
@@ -333,14 +324,13 @@ class HomeScreen extends Component {
                       newGasAfterCalibration =
                         this.props.settings.gas_calibration - jsonData.gas;
                     }
-                    isGasHigh =
-                      newGasAfterCalibration > this.props.settings.gas_threshold
-                        ? true
-                        : false;
                   } else {
                     newGasAfterCalibration = jsonData.gas;
-                    isGasHigh = false;
                   }
+                  isGasHigh =
+                    newGasAfterCalibration > this.props.settings.gas_threshold
+                      ? 1
+                      : 0;
 
                   // wet calibration and data process
                   // wet_calibration should be dry adc value
@@ -351,19 +341,19 @@ class HomeScreen extends Component {
                       newWetAfterCalibration =
                         this.props.settings.wet_calibration - jsonData.wet;
                     }
-                    isWetHigh =
-                      newWetAfterCalibration > this.props.settings.wet_threshold
-                        ? true
-                        : false;
                   } else {
                     newWetAfterCalibration = jsonData.wet;
-                    isWetHigh = false;
                   }
+                  isWetHigh =
+                    newWetAfterCalibration > this.props.settings.wet_threshold
+                      ? 1
+                      : 0;
 
                   // Accelerometer data process
                   //
                   //
-                  if (minAx != 0 || minAy != 0 || minAz != 0) { // ignore init dataset process step
+                  if (minAx != 0 || minAy != 0 || minAz != 0) {
+                    // ignore init dataset process step
                     if (
                       Math.abs(jsonData.ax - minAx) >
                       this.props.settings.ax_threshold
@@ -390,7 +380,9 @@ class HomeScreen extends Component {
                   ) {
                     minAx = axArray.sort((a, b) => a - b)[0];
                     axArray.forEach((e) => {
-                      if (Math.abs(e - minAx) > this.props.settings.ax_threshold) {
+                      if (
+                        Math.abs(e - minAx) > this.props.settings.ax_threshold
+                      ) {
                         axMove = true;
                       } else {
                         axMove = false;
@@ -406,7 +398,9 @@ class HomeScreen extends Component {
                   ) {
                     minAy = ayArray.sort((a, b) => a - b)[0];
                     ayArray.forEach((e) => {
-                      if (Math.abs(e - minAy) > this.props.settings.ay_threshold) {
+                      if (
+                        Math.abs(e - minAy) > this.props.settings.ay_threshold
+                      ) {
                         ayMove = true;
                       } else {
                         ayMove = false;
@@ -422,7 +416,9 @@ class HomeScreen extends Component {
                   ) {
                     minAz = azArray.sort((a, b) => a - b)[0];
                     azArray.forEach((e) => {
-                      if (Math.abs(e - minAz) > this.props.settings.az_threshold) {
+                      if (
+                        Math.abs(e - minAz) > this.props.settings.az_threshold
+                      ) {
                         azMove = true;
                       } else {
                         azMove = false;
@@ -433,9 +429,7 @@ class HomeScreen extends Component {
                   azArray.push(jsonData.az);
 
                   // check whether human moves or not after collecting enough data
-                  axMove || ayMove || azMove
-                    ? (isHumHealthBad = false)
-                    : (isHumHealthBad = true);
+                  isHumHealthBad = axMove || ayMove || azMove ? 0 : 1;
 
                   //
                   //
@@ -443,7 +437,7 @@ class HomeScreen extends Component {
 
                   let device = {
                     ...jsonData,
-                    newGasAfterCalibration: newGasAfterCalibration,
+                    newGasAfterCalibration: newGasAfterCalibration, // gas calibration
                     newWetAfterCalibration: newWetAfterCalibration, // wet calibration
                     isTempHigh: isTempHigh,
                     isWetHigh: isWetHigh,
@@ -453,9 +447,9 @@ class HomeScreen extends Component {
 
                   this.onUpdateDevice(device);
 
-                  if (mqttClient) {
+                  if (this.mqttClient) {
                     // send data to cloud
-                    mqttClient.publish(
+                    this.mqttClient.publish(
                       `sensors/${device.id}`,
                       JSON.stringify(device), // convert to string
                       0,
@@ -471,77 +465,6 @@ class HomeScreen extends Component {
           );
       }
     });
-  }
-
-  renderModalContent() {
-    return (
-      <View style={{flex: 1}}>
-        <Form>
-          <Item stackedLabel>
-            <Label>Device ID</Label>
-            <Input disabled placeholder={this.state.selectedDeviceId} />
-          </Item>
-          <Item stackedLabel last>
-            <Label>Device Name</Label>
-            <Input
-              onChangeText={(newName) =>
-                this.setState({selectedDeviceName: newName})
-              }
-              value={this.state.selectedDeviceName}
-            />
-          </Item>
-          <Button
-            block
-            style={styles.button}
-            onPress={() => {
-              if (
-                !this.props.deviceNames.infos.find(
-                  (info) => this.state.selectedDeviceId === info.id,
-                )
-              ) {
-                this.props.addDeviceName({
-                  id: this.state.selectedDeviceId,
-                  name: this.state.selectedDeviceName,
-                });
-              } else {
-                this.props.updateDeviceName({
-                  id: this.state.selectedDeviceId,
-                  name: this.state.selectedDeviceName,
-                });
-              }
-              this.setState({
-                visibleModal: false,
-              });
-            }}>
-            <Text>Save New Name</Text>
-          </Button>
-          <Button
-            block
-            style={styles.button}
-            onPress={() => {
-              this.props.removeDeviceName({
-                id: this.state.selectedDeviceId,
-                name: this.state.selectedDeviceName,
-              });
-              this.setState({
-                visibleModal: false,
-              });
-            }}>
-            <Text>Remove Name</Text>
-          </Button>
-          <Button
-            block
-            style={styles.button}
-            onPress={() =>
-              this.setState({
-                visibleModal: false,
-              })
-            }>
-            <Text>Close</Text>
-          </Button>
-        </Form>
-      </View>
-    );
   }
 
   render() {
@@ -573,38 +496,10 @@ class HomeScreen extends Component {
           </Right>
         </Header>
         <Content>
-          <Modal
-            transparent={false}
-            visible={this.state.visibleModal}
-            animationType="slide">
-            {this.renderModalContent()}
-          </Modal>
           <FlatList
             data={this.props.devices.activeDevices}
             extraData={this.props.devices}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                onLongPress={() => {
-                  let deviceName = this.props.deviceNames.infos.find(
-                    (info) => item.id === info.id,
-                  )
-                    ? this.props.deviceNames.infos.find(
-                        (info) => item.id === info.id,
-                      ).name
-                    : item.id;
-                  this.setState({
-                    visibleModal: true,
-                    selectedDeviceId: item.id,
-                    selectedDeviceName: deviceName,
-                  });
-                }}>
-                <Card
-                  key={item.id}
-                  device={item}
-                  deviceNames={this.props.deviceNames.infos}
-                />
-              </TouchableOpacity>
-            )}
+            renderItem={({item}) => <Card key={item.id} device={item} />}
             keyExtractor={(item, index) => index.toString()}
           />
         </Content>
@@ -612,18 +507,6 @@ class HomeScreen extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  input: {
-    marginLeft: 20,
-    marginRight: 20,
-    marginVertical: 10,
-  },
-  button: {
-    backgroundColor: '#54c740',
-    margin: 10,
-  },
-});
 
 const mapStateToProps = (state) => {
   const {devices, settings, deviceNames} = state;
