@@ -17,8 +17,6 @@ Home                               |  Setting                                 | 
 - Node v10.18.1
 - [beuth-printed-sensor-fw](https://github.com/pdt590/beuth-printed-sensor-fw)
 - [beuth-printed-sensor-hw](https://github.com/pdt590/beuth-printed-sensor-hw)
-- [beuth-printed-app](https://github.com/pdt590/beuth-printed-app)
-- [beuth-printed-gateway](https://github.com/pdt590/beuth-printed-gateway)
 - [beuth-printed-cloud](https://github.com/pdt590/beuth-printed-cloud)
 
 ## ReactNative
