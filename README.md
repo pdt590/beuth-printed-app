@@ -1,6 +1,10 @@
 # PrintED
 
-Android and iOS application for PrintED project
+Android and iOS application for PrintED project [on Google Play](https://play.google.com/store/apps/details?id=com.printedapp)
+
+Home                           |  Setting                          | Name
+:-----------------------------:|:---------------------------------:|:----------------------------------:
+![](design/ui/home-screen.jpg) | ![](design/ui/setting-screen.jpg) | ![](design/ui/name-screen.jpg)
 
 ## Compatibility
 
